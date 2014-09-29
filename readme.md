@@ -30,7 +30,7 @@ big enough.  If it guessed too small, or there was a decoding error, `null` is r
 
 ```javascript
 // decode a buffer where the output size is known
-brotli.decode(woffFile.slice(dataOffset, dataOffset + compressedLength), uncompressedLength);
+brotli.decode(compressedData, uncompressedLength);
 
 // decode a buffer where the output size is not known
 brotli.decode(fs.readFileSync('compressed.bin'));
