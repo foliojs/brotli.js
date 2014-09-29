@@ -1,0 +1,22 @@
+{
+  "name": "brotli",
+  "version": "1.0.0",
+  "description": "A port of the Brotli compression algorithm as used in WOFF2",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/devongovett/brotli.js.git"
+  },
+  "keywords": [
+    "compress",
+    "decompress",
+    "encode",
+    "decode"
+  ],
+  "author": "Devon Govett <devongovett@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/devongovett/brotli.js/issues"
+  },
+  "homepage": "https://github.com/devongovett/brotli.js"
+}
