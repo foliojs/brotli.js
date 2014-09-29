@@ -19,7 +19,7 @@ var brotli = require('brotli');
 
 ## API
 
-### brotli.decode(buffer, outSize)
+### brotli.decompress(buffer, outSize)
 
 Decompresses the given buffer to produce the original input to the compressor.
 This function works best if you know the original size of the data (e.g. to decompressed size).
@@ -30,13 +30,13 @@ big enough.  If it guessed too small, or there was a decoding error, `null` is r
 
 ```javascript
 // decode a buffer where the output size is known
-brotli.decode(compressedData, uncompressedLength);
+brotli.decompress(compressedData, uncompressedLength);
 
 // decode a buffer where the output size is not known
-brotli.decode(fs.readFileSync('compressed.bin'));
+brotli.decompress(fs.readFileSync('compressed.bin'));
 ```
 
-### brotli.encode(buffer, isText = false)
+### brotli.compress(buffer, isText = false)
 
 Compresses the given buffer.  Pass `true` as the second argument if the input
 buffer is text data.  Pass `false` or nothing if it is binary.  This function
@@ -44,10 +44,10 @@ is known to be quite slow.
 
 ```javascript
 // encode a buffer of binary data
-brotli.encode(fs.readFileSync('myfile.bin'));
+brotli.compress(fs.readFileSync('myfile.bin'));
 
 // encode some text data
-brotli.encode(fs.readFileSync('myfile.bin'), true);
+brotli.compress(fs.readFileSync('myfile.bin'), true);
 ```
 
 ## License
