@@ -14,7 +14,6 @@ ENCOBJ = $(ENCSRC:.cc=.o)
 
 all: $(DECOBJ) $(ENCOBJ)
 	$(CPP) $(CPPFLAGS) $^ -o brotli.js
-	echo "module.exports = Module" >> brotli.js
 
 clean:
 	rm -f $(DECOBJ) $(ENCOBJ)
