@@ -18,5 +18,15 @@
   "bugs": {
     "url": "https://github.com/devongovett/brotli.js/issues"
   },
-  "homepage": "https://github.com/devongovett/brotli.js"
+  "homepage": "https://github.com/devongovett/brotli.js",
+  "dependencies": {
+    "brfs": "^1.4.0",
+    "pako": "^0.2.6",
+    "through": "^2.3.6"
+  },
+  "browserify": {
+    "transform": [
+      "./src/transform"
+    ]
+  },
 }

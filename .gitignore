@@ -1,2 +1,4 @@
-brotli.js
-brotli.js.map
+build/
+node_modules/
+.DS_Store
+*.o
