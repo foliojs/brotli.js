@@ -24,9 +24,15 @@
     "pako": "^0.2.6",
     "through": "^2.3.6"
   },
+  "devDependencies": {
+    "mocha": "^2.2.1"
+  },
   "browserify": {
     "transform": [
       "./src/transform"
     ]
   },
+  "scripts": {
+    "test": "mocha"
+  }
 }
