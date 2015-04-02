@@ -17,6 +17,13 @@ In node, or in browserify, you can load brotli in the standard way:
 var brotli = require('brotli');
 ```
 
+You can also require just the `decompress` function or just the `compress` function, which is useful for browserify builds.
+For example, here's how you'd require just the `decompress` function.
+
+```javascript
+var decompress = require('brotli/decompress');
+```
+
 ## API
 
 ### brotli.decompress(buffer, outSize)
