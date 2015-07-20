@@ -576,7 +576,7 @@ function BrotliDecompress(input, output) {
   ringbuffer_size = 1 << window_bits;
   ringbuffer_mask = ringbuffer_size - 1;
   ringbuffer = new Uint8Array(ringbuffer_size + kRingBufferWriteAheadSlack + BrotliDictionary.maxDictionaryWordLength);
-  ringbuffer_end = ringbuffer + ringbuffer_size;
+  ringbuffer_end = ringbuffer_size;
 
   block_type_trees = [];
   block_len_trees = [];
