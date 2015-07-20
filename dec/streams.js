@@ -22,7 +22,10 @@ function BrotliOutput(buf) {
   this.pos = 0;
 }
 
-BrotliOutput.prototype.write = function(buf, count) {  
+BrotliOutput.prototype.write = function(buf, count) {
+  if (this.pos + count > this.buffer.length)
+    throw new Error('Output buffer is not large enough');
+  
   this.buffer.set(buf.subarray(0, count), this.pos);
   this.pos += count;
   return count;

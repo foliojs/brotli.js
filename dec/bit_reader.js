@@ -52,17 +52,6 @@ BrotliBitReader.prototype.reset = function() {
   return this.bit_end_pos_ > 0;
 };
 
-/* Reload up to 32 bits byte-by-byte */
-BrotliBitReader.prototype.shiftBytes = function() {  
-  while (this.bit_pos_ >= 8) {
-    this.val_ >>>= 8;
-    this.val_ |= this.buf_[this.pos_ & BROTLI_IBUF_MASK] << (32 - 8);
-    ++this.pos_;
-    this.bit_pos_ -= 8;
-    this.bit_end_pos_ -= 8;
-  }
-};
-
 /* Fills up the input ringbuffer by calling the input callback.
 
    Does nothing if there are at least 32 bytes present after current position.
@@ -77,14 +66,15 @@ BrotliBitReader.prototype.shiftBytes = function() {
 */
 BrotliBitReader.prototype.readMoreInput = function() {
   if (this.bit_end_pos_ > 256) {
-    return 1;
+    return;
   } else if (this.eos_) {
-    return this.bit_pos_ <= this.bit_end_pos_ ? 1 : 0;
+    if (this.bit_pos_ > this.bit_end_pos_)
+      throw new Error('Unexpected end of input');
   } else {
     var dst = this.buf_ptr_;
     var bytes_read = this.input_.read(this.buf_, dst, BROTLI_READ_SIZE);
     if (bytes_read < 0) {
-      return 0;
+      throw new Error('Unexpected end of input');
     }
     
     if (bytes_read < BROTLI_READ_SIZE) {
@@ -105,18 +95,26 @@ BrotliBitReader.prototype.readMoreInput = function() {
     }
     
     this.bit_end_pos_ += bytes_read << 3;
-    return 1;
   }
 };
 
-/* Advances the Read buffer by 5 bytes to make room for reading next 24 bits. */
-BrotliBitReader.prototype.fillBitWindow = function() {
-    this.shiftBytes();
+/* Guarantees that there are at least 24 bits in the buffer. */
+BrotliBitReader.prototype.fillBitWindow = function() {    
+  while (this.bit_pos_ >= 8) {
+    this.val_ >>>= 8;
+    this.val_ |= this.buf_[this.pos_ & BROTLI_IBUF_MASK] << 24;
+    ++this.pos_;
+    this.bit_pos_ -= 8;
+    this.bit_end_pos_ -= 8;
+  }
 };
 
 /* Reads the specified number of bits from Read Buffer. */
 BrotliBitReader.prototype.readBits = function(n_bits) {
-  this.fillBitWindow();
+  if (32 - this.bit_pos_ < n_bits) {
+    this.fillBitWindow();
+  }
+  
   var val = ((this.val_ >>> this.bit_pos_) & kBitMask[n_bits]);
   this.bit_pos_ += n_bits;
   return val;

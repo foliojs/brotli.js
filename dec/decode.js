@@ -135,9 +135,8 @@ function ReadHuffmanCodeLengths(code_length_code_lengths, num_symbols, code_leng
   while (symbol < num_symbols && space > 0) {
     var p = 0;
     var code_len;
-    if (!br.readMoreInput()) {
-      throw new Error("[ReadHuffmanCodeLengths] Unexpected end of input.\n");
-    }
+    
+    br.readMoreInput();
     br.fillBitWindow();
     p += (br.val_ >>> br.bit_pos_) & 31;
     br.bit_pos_ += table[p].bits;
@@ -169,7 +168,7 @@ function ReadHuffmanCodeLengths(code_length_code_lengths, num_symbols, code_leng
       repeat += br.readBits(extra_bits) + 3;
       repeat_delta = repeat - old_repeat;
       if (symbol + repeat_delta > num_symbols) {
-        return 0;
+        throw new Error('[ReadHuffmanCodeLengths] symbol + repeat_delta > num_symbols');
       }
       
       for (var x = 0; x < repeat_delta; x++)
@@ -183,24 +182,19 @@ function ReadHuffmanCodeLengths(code_length_code_lengths, num_symbols, code_leng
     }
   }
   if (space !== 0) {
-    throw new Error("[ReadHuffmanCodeLengths] space = %d\n", space);
+    throw new Error("[ReadHuffmanCodeLengths] space = " + space);
   }
   
   for (; symbol < num_symbols; symbol++)
     code_lengths[symbol] = 0;
-  
-  return 1;
 }
 
 function ReadHuffmanCode(alphabet_size, tables, table, br) {
-  var ok = 1;
   var table_size = 0;
   var simple_code_or_skip;
   var code_lengths = new Uint8Array(alphabet_size);
   
-  if (!br.readMoreInput()) {
-    throw new Error("[ReadHuffmanCode] Unexpected end of input.\n");
-  }
+  br.readMoreInput();
   
   /* simple_code_or_skip is used as follows:
      1 for simple code;
@@ -227,21 +221,29 @@ function ReadHuffmanCode(alphabet_size, tables, table, br) {
       case 1:
         break;
       case 3:
-        ok = ((symbols[0] !== symbols[1]) &&
-              (symbols[0] !== symbols[2]) &&
-              (symbols[1] !== symbols[2]));
+        if ((symbols[0] === symbols[1]) ||
+            (symbols[0] === symbols[2]) ||
+            (symbols[1] === symbols[2])) {
+          throw new Error('[ReadHuffmanCode] invalid symbols');
+        }
         break;
       case 2:
-        ok = (symbols[0] !== symbols[1]);
+        if (symbols[0] === symbols[1]) {
+          throw new Error('[ReadHuffmanCode] invalid symbols');
+        }
+        
         code_lengths[symbols[1]] = 1;
         break;
       case 4:
-        ok = ((symbols[0] !== symbols[1]) &&
-              (symbols[0] !== symbols[2]) &&
-              (symbols[0] !== symbols[3]) &&
-              (symbols[1] !== symbols[2]) &&
-              (symbols[1] !== symbols[3]) &&
-              (symbols[2] !== symbols[3]));
+        if ((symbols[0] === symbols[1]) ||
+            (symbols[0] === symbols[2]) ||
+            (symbols[0] === symbols[3]) ||
+            (symbols[1] === symbols[2]) ||
+            (symbols[1] === symbols[3]) ||
+            (symbols[2] === symbols[3])) {
+          throw new Error('[ReadHuffmanCode] invalid symbols');
+        }
+        
         if (br.readBits(1)) {
           code_lengths[symbols[2]] = 3;
           code_lengths[symbols[3]] = 3;
@@ -276,18 +278,17 @@ function ReadHuffmanCode(alphabet_size, tables, table, br) {
         ++num_codes;
       }
     }
-    ok = (num_codes === 1 || space === 0) &&
-        ReadHuffmanCodeLengths(code_length_code_lengths,
-                               alphabet_size, code_lengths, br);
+    
+    if (!(num_codes === 1 || space === 0))
+      throw new Error('[ReadHuffmanCode] invalid num_codes or space');
+    
+    ReadHuffmanCodeLengths(code_length_code_lengths, alphabet_size, code_lengths, br);
   }
-  if (ok) {    
-    table_size = BrotliBuildHuffmanTable(tables, table, HUFFMAN_TABLE_BITS,
-                                         code_lengths, alphabet_size);
-    if (table_size === 0) {
-      throw new Error("[ReadHuffmanCode] BuildHuffmanTable failed: ");
-    }
-  } else {
-    throw new Error('ReadHuffmanCode failed');
+  
+  table_size = BrotliBuildHuffmanTable(tables, table, HUFFMAN_TABLE_BITS, code_lengths, alphabet_size);
+  
+  if (table_size === 0) {
+    throw new Error("[ReadHuffmanCode] BuildHuffmanTable failed: ");
   }
   
   return table_size;
@@ -352,25 +353,17 @@ HuffmanTreeGroup.prototype.decode = function(br) {
     this.htrees[i] = next;
     table_size = ReadHuffmanCode(this.alphabet_size, this.codes, next, br);
     next += table_size;
-    if (table_size === 0) {
-      throw new Error('Error decoding huffman code');
-      return 0;
-    }
   }
-        
-  return 1;
 };
 
 function DecodeContextMap(context_map_size, br) {
   var out = { num_htrees: null, context_map: null };
-  var ok = 1;
   var use_rle_for_zeros;
   var max_run_length_prefix = 0;
   var table;
   var i;
-  if (!br.readMoreInput()) {
-    throw new Error("[DecodeContextMap] Unexpected end of input.\n");
-  }
+  
+  br.readMoreInput();
   var num_htrees = out.num_htrees = DecodeVarLenUint8(br) + 1;
 
   var context_map = out.context_map = new Uint8Array(context_map_size);
@@ -388,14 +381,12 @@ function DecodeContextMap(context_map_size, br) {
     table[i] = new HuffmanCode(0, 0);
   }
   
-  if (!ReadHuffmanCode(num_htrees + max_run_length_prefix, table, 0, br)) {
-    throw new Error("Bad huffman code");
-  }
+  ReadHuffmanCode(num_htrees + max_run_length_prefix, table, 0, br);
+  
   for (i = 0; i < context_map_size;) {
     var code;
-    if (!br.readMoreInput()) {
-      throw new Error("[DecodeContextMap] Unexpected end of input.\n");
-    }
+
+    br.readMoreInput();
     code = ReadSymbol(table, 0, br);
     if (code === 0) {
       context_map[i] = 0;
@@ -404,7 +395,7 @@ function DecodeContextMap(context_map_size, br) {
       var reps = 1 + (1 << code) + br.readBits(code);
       while (--reps) {
         if (i >= context_map_size) {
-          throw new Error("i >= context_map_size");
+          throw new Error("[DecodeContextMap] i >= context_map_size");
         }
         context_map[i] = 0;
         ++i;
@@ -441,58 +432,6 @@ function DecodeBlockType(max_block_type, trees, tree_type, block_types, ringbuff
   ++indexes[index];
 }
 
-/* Copy len bytes from src to dst. It can write up to ten extra bytes
-   after the end of the copy.
-
-   The main part of this loop is a simple copy of eight bytes at a time until
-   we've copied (at least) the requested amount of bytes.  However, if dst and
-   src are less than eight bytes apart (indicating a repeating pattern of
-   length < 8), we first need to expand the pattern in order to get the correct
-   results. For instance, if the buffer looks like this, with the eight-byte
-   <src> and <dst> patterns marked as intervals:
-
-      abxxxxxxxxxxxx
-      [------]           src
-        [------]         dst
-
-   a single eight-byte copy from <src> to <dst> will repeat the pattern once,
-   after which we can move <dst> two bytes without moving <src>:
-
-      ababxxxxxxxxxx
-      [------]           src
-          [------]       dst
-
-   and repeat the exercise until the two no longer overlap.
-
-   This allows us to do very well in the special case of one single byte
-   repeated many times, without taking a big hit for more general cases.
-
-   The worst case of extra writing past the end of the match occurs when
-   dst - src === 1 and len === 1; the last copy will read from byte positions
-   [0..7] and write to [4..11], whereas it was only supposed to write to
-   position 1. Thus, ten excess bytes.
-*/
-function IncrementalCopyFastPath(dst, src, len) {
-  throw 'broken';
-  if (src < dst) {
-    while (dst - src < 8) {
-      for (var i = 0; i < 8; i++)
-        dst[i] = src[i];
-      
-      len -= (dst - src);
-      dst += dst - src;
-    }
-  }
-  while (len > 0) {
-    for (var i = 0; i < 8; i++)
-      dst[i] = src[i];
-    
-    src += 8;
-    dst += 8;
-    len -= 8;
-  }
-}
-
 function CopyUncompressedBlockToOutput(output, len, pos, ringbuffer, ringbuffer_mask, br) {
   var rb_size = ringbuffer_mask + 1;
   var rb_pos = pos & ringbuffer_mask;
@@ -502,22 +441,18 @@ function CopyUncompressedBlockToOutput(output, len, pos, ringbuffer, ringbuffer_
   /* For short lengths copy byte-by-byte */
   if (len < 8 || br.bit_pos_ + (len << 3) < br.bit_end_pos_) {
     while (len-- > 0) {
-      if (!br.readMoreInput()) {
-        return 0;
-      }
+      br.readMoreInput();
       ringbuffer[rb_pos++] = br.readBits(8);
       if (rb_pos === rb_size) {
-        if (output.write(ringbuffer, rb_size) < rb_size) {
-          return 0;
-        }
+        output.write(ringbuffer, rb_size);
         rb_pos = 0;
       }
     }
-    return 1;
+    return;
   }
 
   if (br.bit_end_pos_ < 32) {
-    return 0;
+    throw new Error('[CopyUncompressedBlockToOutput] br.bit_end_pos_ < 32');
   }
 
   /* Copy remaining 0-4 bytes from br.val_ to ringbuffer. */
@@ -550,9 +485,7 @@ function CopyUncompressedBlockToOutput(output, len, pos, ringbuffer, ringbuffer_
   /* If we wrote past the logical end of the ringbuffer, copy the tail of the
      ringbuffer to its beginning and flush the ringbuffer to the output. */
   if (rb_pos >= rb_size) {
-    if (output.write(ringbuffer, rb_size) < rb_size) {
-      return 0;
-    }
+    output.write(ringbuffer, rb_size);
     rb_pos -= rb_size;    
     for (var x = 0; x < rb_pos; x++)
       ringbuffer[x] = ringbuffer[rb_size + x];
@@ -563,10 +496,10 @@ function CopyUncompressedBlockToOutput(output, len, pos, ringbuffer, ringbuffer_
      the output */
   while (rb_pos + len >= rb_size) {
     nbytes = rb_size - rb_pos;
-    if (br.input_.read(ringbuffer, rb_pos, nbytes) < nbytes ||
-        output.write(ringbuffer, rb_size) < nbytes) {
-      return 0;
+    if (br.input_.read(ringbuffer, rb_pos, nbytes) < nbytes) {
+      throw new Error('[CopyUncompressedBlockToOutput] not enough bytes');
     }
+    output.write(ringbuffer, rb_size);
     len -= nbytes;
     rb_pos = 0;
   }
@@ -574,12 +507,11 @@ function CopyUncompressedBlockToOutput(output, len, pos, ringbuffer, ringbuffer_
   /* Copy straight from the input onto the ringbuffer. The ringbuffer will be
      flushed to the output at a later time. */
   if (br.input_.read(ringbuffer, rb_pos, len) < len) {
-    return 0;
+    throw new Error('[CopyUncompressedBlockToOutput] not enough bytes');
   }
 
   /* Restore the state of the bit reader. */
   br.reset();
-  return 1;
 }
 
 function BrotliDecompressedSize(buffer) {
@@ -607,7 +539,6 @@ function BrotliDecompressBuffer(buffer) {
 exports.BrotliDecompressBuffer = BrotliDecompressBuffer;
 
 function BrotliDecompress(input, output) {
-  var ok = 1;
   var i;
   var pos = 0;
   var input_end = 0;
@@ -654,7 +585,7 @@ function BrotliDecompress(input, output) {
     block_len_trees[x] = new HuffmanCode(0, 0);
   }
 
-  while (!input_end && ok) {
+  while (!input_end) {
     var meta_block_remaining_len = 0;
     var is_uncompressed;
     var block_length = [ 1 << 28, 1 << 28, 1 << 28 ];
@@ -687,44 +618,38 @@ function BrotliDecompress(input, output) {
       hgroup[i].htrees = null;
     }
 
-    if (!br.readMoreInput()) {
-      throw new Error("[BrotliDecompress] Unexpected end of input.\n");
-    }
+    br.readMoreInput();
     
     var _out = DecodeMetaBlockLength(br);
     meta_block_remaining_len = _out.meta_block_length;
     input_end = _out.input_end;
     is_uncompressed = _out.is_uncompressed;
-        
+    
     if (meta_block_remaining_len === 0) {
-      return end();
+      output.write(ringbuffer, pos & ringbuffer_mask);
+      return;
     }
+    
     if (is_uncompressed) {
       br.bit_pos_ = (br.bit_pos_ + 7) & ~7;
-      ok = CopyUncompressedBlockToOutput(output, meta_block_remaining_len, pos,
-                                         ringbuffer, ringbuffer_mask, br);
+      CopyUncompressedBlockToOutput(output, meta_block_remaining_len, pos,
+                                    ringbuffer, ringbuffer_mask, br);
       pos += meta_block_remaining_len;
-      return end();
+      output.write(ringbuffer, pos & ringbuffer_mask);
+      return;
     }
+    
     for (i = 0; i < 3; ++i) {
       num_block_types[i] = DecodeVarLenUint8(br) + 1;
       if (num_block_types[i] >= 2) {
-        if (!ReadHuffmanCode(num_block_types[i] + 2,
-                             block_type_trees, i * HUFFMAN_MAX_TABLE_SIZE,
-                             br) ||
-            !ReadHuffmanCode(kNumBlockLengthCodes,
-                             block_len_trees, i * HUFFMAN_MAX_TABLE_SIZE,
-                             br)) {
-           throw new Error('Could not decode huffman code');
-        }
+        ReadHuffmanCode(num_block_types[i] + 2, block_type_trees, i * HUFFMAN_MAX_TABLE_SIZE, br);
+        ReadHuffmanCode(kNumBlockLengthCodes, block_len_trees, i * HUFFMAN_MAX_TABLE_SIZE, br);
         block_length[i] = ReadBlockLength(block_len_trees, i * HUFFMAN_MAX_TABLE_SIZE, br);
         block_type_rb_index[i] = 1;
       }
     }
     
-    if (!br.readMoreInput()) {
-      throw new Error("[BrotliDecompress] Unexpected end of input.\n");
-    }
+    br.readMoreInput();
     
     distance_postfix_bits = br.readBits(2);
     num_direct_distance_codes = NUM_DISTANCE_SHORT_CODES + (br.readBits(4) << distance_postfix_bits);
@@ -735,15 +660,12 @@ function BrotliDecompress(input, output) {
     for (i = 0; i < num_block_types[0]; ++i) {
       context_modes[i] = (br.readBits(2) << 1);
     }
-
-    var _o1, _o2;
-    if (!(_o1 = DecodeContextMap(num_block_types[0] << kLiteralContextBits, br)) ||
-        !(_o2 = DecodeContextMap(num_block_types[2] << kDistanceContextBits, br))) {
-      throw new Error('Could not decode context map');
-    }
     
+    var _o1 = DecodeContextMap(num_block_types[0] << kLiteralContextBits, br);
     num_literal_htrees = _o1.num_htrees;
     context_map = _o1.context_map;
+    
+    var _o2 = DecodeContextMap(num_block_types[2] << kDistanceContextBits, br);
     num_dist_htrees = _o2.num_htrees;
     dist_context_map = _o2.context_map;
     
@@ -752,10 +674,7 @@ function BrotliDecompress(input, output) {
     hgroup[2] = new HuffmanTreeGroup(num_distance_codes, num_dist_htrees);
 
     for (i = 0; i < 3; ++i) {
-      if (!hgroup[i].decode(br)) {
-        ok = 0;
-        return end();
-      }
+      hgroup[i].decode(br);
     }
 
     context_map_slice = 0;
@@ -777,9 +696,9 @@ function BrotliDecompress(input, output) {
       var context;
       var j;
       var copy_dst;
-      if (!br.readMoreInput()) {
-        throw new Error("[BrotliDecompress] Unexpected end of input.\n");
-      }
+
+      br.readMoreInput();
+      
       if (block_length[1] === 0) {
         DecodeBlockType(num_block_types[1],
                         block_type_trees, 1, block_type, block_type_rb,
@@ -803,9 +722,8 @@ function BrotliDecompress(input, output) {
       copy_length = Prefix.kCopyLengthPrefixCode[copy_code].offset +
           br.readBits(Prefix.kCopyLengthPrefixCode[copy_code].nbits);
       for (j = 0; j < insert_length; ++j) {
-        if (!br.readMoreInput()) {
-          throw new Error("[BrotliDecompress] Unexpected end of input.\n");
-        }
+        br.readMoreInput();
+
         if (block_length[0] === 0) {
           DecodeBlockType(num_block_types[0],
                           block_type_trees, 0, block_type, block_type_rb,
@@ -825,10 +743,7 @@ function BrotliDecompress(input, output) {
         prev_byte1 = ReadSymbol(hgroup[0].codes, hgroup[0].htrees[literal_htree_index], br);
         ringbuffer[pos & ringbuffer_mask] = prev_byte1;
         if ((pos & ringbuffer_mask) === ringbuffer_mask) {
-          if (output.write(ringbuffer, ringbuffer_size) < 0) {
-            ok = 0;
-            return end();
-          }
+          output.write(ringbuffer, ringbuffer_size);
         }
         ++pos;
       }
@@ -837,9 +752,8 @@ function BrotliDecompress(input, output) {
 
       if (distance_code < 0) {
         var context;
-        if (!br.readMoreInput()) {
-          throw new Error("[BrotliDecompress] Unexpected end of input.\n");
-        }
+        
+        br.readMoreInput();
         if (block_length[2] === 0) {
           DecodeBlockType(num_block_types[2],
                           block_type_trees, 2, block_type, block_type_rb,
@@ -871,8 +785,7 @@ function BrotliDecompress(input, output) {
       /* up past distnaces from the ringbuffer. */
       distance = TranslateShortCodes(distance_code, dist_rb, dist_rb_idx);
       if (distance < 0) {
-        ok = 0;
-        return end();
+        throw new Error('[BrotliDecompress] invalid distance');
       }
 
       if (pos < max_backward_distance &&
@@ -900,10 +813,7 @@ function BrotliDecompress(input, output) {
             pos += len;
             meta_block_remaining_len -= len;
             if (copy_dst >= ringbuffer_end) {
-              if (output.write(ringbuffer, ringbuffer_size) < 0) {
-                ok = 0;
-                return end();
-              }
+              output.write(ringbuffer, ringbuffer_size);
               
               for (var _x = 0; _x < (copy_dst - ringbuffer_end); _x++)
                 ringbuffer[_x] = ringbuffer[ringbuffer_end + _x];
@@ -930,10 +840,7 @@ function BrotliDecompress(input, output) {
         for (j = 0; j < copy_length; ++j) {
           ringbuffer[pos & ringbuffer_mask] = ringbuffer[(pos - distance) & ringbuffer_mask];
           if ((pos & ringbuffer_mask) === ringbuffer_mask) {
-            if (output.write(ringbuffer, ringbuffer_size) < 0) {
-              ok = 0;
-              return end();
-            }
+            output.write(ringbuffer, ringbuffer_size);
           }
           ++pos;
           --meta_block_remaining_len;
@@ -951,14 +858,7 @@ function BrotliDecompress(input, output) {
     pos &= 0x3fffffff;
   }
 
-  function end() {
-    if (output.write(ringbuffer, pos & ringbuffer_mask) < 0)
-      ok = 0;
-    
-    return ok;
-  }
-  
-  return end();
+  output.write(ringbuffer, pos & ringbuffer_mask);
 }
 
 exports.BrotliDecompress = BrotliDecompress;
