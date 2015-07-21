@@ -34,6 +34,7 @@ function BrotliBitReader(input) {
 }
 
 BrotliBitReader.READ_SIZE = BROTLI_READ_SIZE;
+BrotliBitReader.IBUF_MASK = BROTLI_IBUF_MASK;
 
 BrotliBitReader.prototype.reset = function() {
   this.buf_ptr_ = 0;      /* next input will write here */

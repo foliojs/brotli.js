@@ -435,7 +435,7 @@ function DecodeBlockType(max_block_type, trees, tree_type, block_types, ringbuff
 function CopyUncompressedBlockToOutput(output, len, pos, ringbuffer, ringbuffer_mask, br) {
   var rb_size = ringbuffer_mask + 1;
   var rb_pos = pos & ringbuffer_mask;
-  var br_pos = br.pos_ & BROTLI_IBUF_MASK;
+  var br_pos = br.pos_ & BrotliBitReader.IBUF_MASK;
   var nbytes;
 
   /* For short lengths copy byte-by-byte */
@@ -465,8 +465,8 @@ function CopyUncompressedBlockToOutput(output, len, pos, ringbuffer, ringbuffer_
 
   /* Copy remaining bytes from br.buf_ to ringbuffer. */
   nbytes = (br.bit_end_pos_ - br.bit_pos_) >> 3;
-  if (br_pos + nbytes > BROTLI_IBUF_MASK) {
-    var tail = BROTLI_IBUF_MASK + 1 - br_pos;
+  if (br_pos + nbytes > BrotliBitReader.IBUF_MASK) {
+    var tail = BrotliBitReader.IBUF_MASK + 1 - br_pos;
     for (var x = 0; x < tail; x++)
       ringbuffer[rb_pos + x] = br.buf_[br_pos + x];
     
