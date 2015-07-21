@@ -19,7 +19,7 @@ describe('brotli', function() {
     });
     
     it('should compress some text data', function() {
-      this.timeout(10000); // not sure why the first time text data is compressed it is slow...
+      this.timeout(100000); // not sure why the first time text data is compressed it is slow...
       var data = fs.readFileSync('build/decode.js', 'utf8').slice(0, 1024 * 4);
       var res = brotli.compress(data, true);
       assert(res.length < data.length);

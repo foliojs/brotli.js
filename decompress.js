@@ -1,2 +1,1 @@
-var brotli = require('./build/decode');
-module.exports = require('./src/decompress').bind(brotli);
+module.exports = require('./dec/decode').BrotliDecompressBuffer;
