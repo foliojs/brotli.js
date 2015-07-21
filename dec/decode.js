@@ -862,3 +862,5 @@ function BrotliDecompress(input, output) {
 }
 
 exports.BrotliDecompress = BrotliDecompress;
+
+BrotliDictionary.init();
