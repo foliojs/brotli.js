@@ -1,4 +1,3 @@
 vendor/
-dec/
 *.o
 .DS_Store
