@@ -70,7 +70,7 @@ BrotliBitReader.prototype.readMoreInput = function() {
     return;
   } else if (this.eos_) {
     if (this.bit_pos_ > this.bit_end_pos_)
-      throw new Error('Unexpected end of input');
+      throw new Error('Unexpected end of input ' + this.bit_pos_ + ' ' + this.bit_end_pos_);
   } else {
     var dst = this.buf_ptr_;
     var bytes_read = this.input_.read(this.buf_, dst, BROTLI_READ_SIZE);
@@ -105,8 +105,8 @@ BrotliBitReader.prototype.fillBitWindow = function() {
     this.val_ >>>= 8;
     this.val_ |= this.buf_[this.pos_ & BROTLI_IBUF_MASK] << 24;
     ++this.pos_;
-    this.bit_pos_ -= 8;
-    this.bit_end_pos_ -= 8;
+    this.bit_pos_ = this.bit_pos_ - 8 >>> 0;
+    this.bit_end_pos_ = this.bit_end_pos_ - 8 >>> 0;
   }
 };
 
