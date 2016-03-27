@@ -44,4 +44,17 @@ describe('brotli', function() {
       });
     });
   });
+  
+  describe('roundtrip', function() {
+    var files = ['alice29.txt', 'asyoulik.txt', 'lcet10.txt', 'plrabn12.txt'];
+    files.forEach(function(file) {
+      it(file, function() {
+        this.timeout(10000);
+        var input = fs.readFileSync(__dirname + '/testdata/' + file);
+        var compressed = compress(input);
+        var decompressed = decompress(compressed);
+        assert.deepEqual(new Buffer(decompressed), input);
+      });
+    });
+  });
 });
