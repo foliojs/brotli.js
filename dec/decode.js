@@ -51,6 +51,11 @@ const kDistanceShortCodeValueOffset = new Int8Array([
   0, 0, 0, 0, -1, 1, -2, 2, -3, 3, -1, 1, -2, 2, -3, 3
 ]);
 
+const kMaxHuffmanTableSize = new Uint16Array([
+  256, 402, 436, 468, 500, 534, 566, 598, 630, 662, 694, 726, 758, 790, 822,
+  854, 886, 920, 952, 984, 1016, 1048, 1080
+]);
+
 function DecodeWindowBits(br) {
   var n;
   if (br.readBits(1) === 0) {
@@ -374,10 +379,7 @@ function InverseMoveToFrontTransform(v, v_len) {
 function HuffmanTreeGroup(alphabet_size, num_htrees) {
   this.alphabet_size = alphabet_size;
   this.num_htrees = num_htrees;
-  this.codes = [];
-  for (var i = 0; i < num_htrees * HUFFMAN_MAX_TABLE_SIZE; i++)
-    this.codes[i] = new HuffmanCode(0, 0);
-  
+  this.codes = new Array(num_htrees + num_htrees * kMaxHuffmanTableSize[(alphabet_size + 31) >>> 5]);  
   this.htrees = new Uint32Array(num_htrees);
 }
 

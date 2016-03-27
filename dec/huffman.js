@@ -111,8 +111,7 @@ exports.BrotliBuildHuffmanTable = function(root_table, table, root_bits, code_le
         table_size = 1 << table_bits;
         total_size += table_size;
         low = key & mask;
-        root_table[start_table + low].bits = (table_bits + root_bits) & 0xff;
-        root_table[start_table + low].value = ((table - start_table) - low) & 0xffff;
+        root_table[start_table + low] = new HuffmanCode((table_bits + root_bits) & 0xff, ((table - start_table) - low) & 0xffff);
       }
       code = new HuffmanCode((len - root_bits) & 0xff, sorted[symbol++] & 0xffff);
       ReplicateValue(root_table, table + (key >> root_bits), step, table_size, code);
