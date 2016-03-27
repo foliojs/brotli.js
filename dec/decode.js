@@ -52,11 +52,22 @@ const kDistanceShortCodeValueOffset = new Int8Array([
 ]);
 
 function DecodeWindowBits(br) {
-  if (br.readBits(1)) {
-    return 17 + br.readBits(3);
-  } else {
+  var n;
+  if (br.readBits(1) === 0) {
     return 16;
   }
+  
+  n = br.readBits(3);
+  if (n > 0) {
+    return 17 + n;
+  }
+  
+  n = br.readBits(3);
+  if (n > 0) {
+    return 8 + n;
+  }
+  
+  return 17;
 }
 
 /* Decodes a number in the range [0..255], by reading 1 - 11 bits. */
