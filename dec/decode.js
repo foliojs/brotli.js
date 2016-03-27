@@ -568,11 +568,14 @@ function BrotliDecompressedSize(buffer) {
 
 exports.BrotliDecompressedSize = BrotliDecompressedSize;
 
-function BrotliDecompressBuffer(buffer) {  
-  var output_size = BrotliDecompressedSize(buffer);
-  var output_buffer = new Uint8Array(output_size);
-  
+function BrotliDecompressBuffer(buffer, output_size) {
   var input = new BrotliInput(buffer);
+  
+  if (output_size == null) {
+    output_size = BrotliDecompressedSize(buffer);
+  }
+  
+  var output_buffer = new Uint8Array(output_size);
   var output = new BrotliOutput(output_buffer);
   
   BrotliDecompress(input, output);
