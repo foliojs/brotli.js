@@ -33,19 +33,15 @@ describe('brotli', function() {
   });
   
   describe('decompress', function() {
-    var data = fs.readFileSync('build/decode.js').slice(0, 1024 * 4);
-    var compressed = brotli.compress(data);
-    
-    it('should decompress some data', function() {
-      var res = brotli.decompress(compressed, data.length);
-      assert.equal(res.length, data.length);
-      assert.deepEqual(new Buffer(res), data);
-    });
-    
-    it('should decompress some data using standalone version', function() {
-      var res = decompress(compressed, data.length);
-      assert.equal(res.length, data.length);
-      assert.deepEqual(new Buffer(res), data);
+    fs.readdirSync(__dirname + '/testdata').forEach(function(file) {
+      if (!/\.compressed/.test(file)) return;
+      
+      it(file, function() {
+        var compressed = fs.readFileSync(__dirname + '/testdata/' + file);
+        var expected = fs.readFileSync(__dirname + '/testdata/' + file.replace(/\.compressed.*/, ''));
+        var result = decompress(compressed);
+        assert.deepEqual(new Buffer(result), expected);
+      });
     });
   });
 });
