@@ -76,26 +76,51 @@ function MetaBlockLength() {
   this.meta_block_length = 0;
   this.input_end = 0;
   this.is_uncompressed = 0;
+  this.is_metadata = false;
 }
 
 function DecodeMetaBlockLength(br) {
   var out = new MetaBlockLength;  
   var size_nibbles;
+  var size_bytes;
   var i;
   
   out.input_end = br.readBits(1);
   if (out.input_end && br.readBits(1)) {
-    return;
+    return out;
   }
   
   size_nibbles = br.readBits(2) + 4;
-  for (i = 0; i < size_nibbles; ++i) {
-    out.meta_block_length |= br.readBits(4) << (i * 4);
+  if (size_nibbles === 7) {
+    out.is_metadata = true;
+    
+    if (br.readBits(1) !== 0)
+      throw new Error('Invalid reserved bit');
+    
+    size_bytes = br.readBits(2);
+    if (size_bytes === 0)
+      return out;
+    
+    for (i = 0; i < size_bytes; i++) {
+      var next_byte = br.readBits(8);
+      if (i + 1 === size_bytes && size_bytes > 1 && next_byte === 0)
+        throw new Error('Invalid size byte');
+      
+      out.meta_block_length |= next_byte << (i * 8);
+    }
+  } else {
+    for (i = 0; i < size_nibbles; ++i) {
+      var next_nibble = br.readBits(4);
+      if (i + 1 === size_nibbles && size_nibbles > 4 && next_nibble === 0)
+        throw new Error('Invalid size nibble');
+      
+      out.meta_block_length |= next_nibble << (i * 4);
+    }
   }
   
   ++out.meta_block_length;
   
-  if (!out.input_end) {
+  if (!out.input_end && !out.is_metadata) {
     out.is_uncompressed = br.readBits(1);
   }
   
@@ -514,6 +539,14 @@ function CopyUncompressedBlockToOutput(output, len, pos, ringbuffer, ringbuffer_
   br.reset();
 }
 
+/* Advances the bit reader position to the next byte boundary and verifies
+   that any skipped bits are set to zero. */
+function JumpToByteBoundary(br) {
+  var new_bit_pos = (br.bit_pos_ + 7) & ~7;
+  var pad_bits = br.readBits(new_bit_pos - br.bit_pos_);
+  return pad_bits == 0;
+}
+
 function BrotliDecompressedSize(buffer) {
   var input = new BrotliInput(buffer);
   var br = new BrotliBitReader(input);
@@ -625,9 +658,20 @@ function BrotliDecompress(input, output) {
     input_end = _out.input_end;
     is_uncompressed = _out.is_uncompressed;
     
+    if (_out.is_metadata) {
+      JumpToByteBoundary(br);
+      
+      for (; meta_block_remaining_len > 0; --meta_block_remaining_len) {
+        br.readMoreInput();
+        /* Read one byte and ignore it. */
+        br.readBits(8);
+      }
+      
+      continue;
+    }
+    
     if (meta_block_remaining_len === 0) {
-      output.write(ringbuffer, pos & ringbuffer_mask);
-      return;
+      continue;
     }
     
     if (is_uncompressed) {
@@ -635,8 +679,7 @@ function BrotliDecompress(input, output) {
       CopyUncompressedBlockToOutput(output, meta_block_remaining_len, pos,
                                     ringbuffer, ringbuffer_mask, br);
       pos += meta_block_remaining_len;
-      output.write(ringbuffer, pos & ringbuffer_mask);
-      return;
+      continue;
     }
     
     for (i = 0; i < 3; ++i) {
