@@ -577,6 +577,10 @@ function BrotliDecompressBuffer(buffer) {
   
   BrotliDecompress(input, output);
   
+  if (output.pos < output_buffer.length) {
+    output_buffer = output_buffer.subarray(0, output.pos);
+  }
+  
   return output_buffer;
 }
 
