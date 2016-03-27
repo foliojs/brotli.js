@@ -1,7 +1,7 @@
 # Brotli.js
 
-Brotli.js is port of the [Brotli](http://tools.ietf.org/html/draft-alakuijala-brotli-01) compression algorithm (as used in the [WOFF2](http://www.w3.org/TR/WOFF2/) font format) to JavaScript using Emscripten.  The original C++ source code can be found
-[here](https://code.google.com/p/font-compression-reference) and in this repo as a submodule.
+Brotli.js is port of the [Brotli](http://tools.ietf.org/html/draft-alakuijala-brotli-01) compression algorithm (as used in the [WOFF2](http://www.w3.org/TR/WOFF2/) font format) to JavaScript. The decompressor is hand ported, and the compressor is ported
+with Emscripten.  The original C++ source code can be found [here](http://github.com/google/brotli).
 
 ## Installation and usage
 
@@ -26,14 +26,11 @@ var decompress = require('brotli/decompress');
 
 ## API
 
-### brotli.decompress(buffer, outSize)
+### brotli.decompress(buffer, [outSize])
 
 Decompresses the given buffer to produce the original input to the compressor.
-This function works best if you know the original size of the data (e.g. to decompressed size).
-Inside a WOFF2 file, this is encoded as a field in the header of the binary file.
-If you don't know the size of the input, don't include the outSize argument and 
-the function will guess a size that it thinks will be
-big enough.  If it guessed too small, or there was a decoding error, `null` is returned.
+The `outSize` parameter is optional, and will be computed by the decompressor
+if not provided. Inside a WOFF2 file, this can be computed from the WOFF2 directory.
 
 ```javascript
 // decode a buffer where the output size is known
