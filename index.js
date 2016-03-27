@@ -1,4 +1,2 @@
-var brotli = require('./build/all');
-
-exports.compress = require('./compress').bind(brotli);
-exports.decompress = require('./decompress').bind(brotli);
+exports.compress = require('./compress');
+exports.decompress = require('./dec/decode').BrotliDecompressBuffer;
