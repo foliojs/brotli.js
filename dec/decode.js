@@ -582,11 +582,11 @@ function BrotliDecompressBuffer(buffer, output_size) {
   
   BrotliDecompress(input, output);
   
-  if (output.pos < output_buffer.length) {
-    output_buffer = output_buffer.subarray(0, output.pos);
+  if (output.pos < output.buffer.length) {
+    output.buffer = output.buffer.subarray(0, output.pos);
   }
   
-  return output_buffer;
+  return output.buffer;
 }
 
 exports.BrotliDecompressBuffer = BrotliDecompressBuffer;
@@ -675,6 +675,12 @@ function BrotliDecompress(input, output) {
     
     var _out = DecodeMetaBlockLength(br);
     meta_block_remaining_len = _out.meta_block_length;
+    if (output.pos + meta_block_remaining_len > output.buffer.length) {
+      /* We need to grow the output buffer to fit the additional data. */
+      var tmp = new Uint8Array( output.pos + meta_block_remaining_len );
+      tmp.set( output.buffer );
+      output.buffer = tmp;
+    }    
     input_end = _out.input_end;
     is_uncompressed = _out.is_uncompressed;
     
