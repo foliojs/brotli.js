@@ -675,9 +675,9 @@ function BrotliDecompress(input, output) {
     
     var _out = DecodeMetaBlockLength(br);
     meta_block_remaining_len = _out.meta_block_length;
-    if (output.pos + meta_block_remaining_len > output.buffer.length) {
+    if (pos + meta_block_remaining_len > output.buffer.length) {
       /* We need to grow the output buffer to fit the additional data. */
-      var tmp = new Uint8Array( output.pos + meta_block_remaining_len );
+      var tmp = new Uint8Array( pos + meta_block_remaining_len );
       tmp.set( output.buffer );
       output.buffer = tmp;
     }    
@@ -727,7 +727,8 @@ function BrotliDecompress(input, output) {
     context_modes = new Uint8Array(num_block_types[0]);
 
     for (i = 0; i < num_block_types[0]; ++i) {
-      context_modes[i] = (br.readBits(2) << 1);
+       br.readMoreInput();
+       context_modes[i] = (br.readBits(2) << 1);
     }
     
     var _o1 = DecodeContextMap(num_block_types[0] << kLiteralContextBits, br);
@@ -790,6 +791,8 @@ function BrotliDecompress(input, output) {
           br.readBits(Prefix.kInsertLengthPrefixCode[insert_code].nbits);
       copy_length = Prefix.kCopyLengthPrefixCode[copy_code].offset +
           br.readBits(Prefix.kCopyLengthPrefixCode[copy_code].nbits);
+      prev_byte1 = ringbuffer[pos-1 & ringbuffer_mask];
+      prev_byte2 = ringbuffer[pos-2 & ringbuffer_mask];
       for (j = 0; j < insert_length; ++j) {
         br.readMoreInput();
 
