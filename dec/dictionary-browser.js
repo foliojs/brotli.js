@@ -10,6 +10,6 @@ var fs = require('fs');
  */
 exports.init = function() {
   var BrotliDecompressBuffer = require('./decode').BrotliDecompressBuffer;
-  var compressed = base64.toByteArray(fs.readFileSync(__dirname + '/dictionary.bin', 'base64'));
+  var compressed = base64.toByteArray(require('./dictionary.bin.js'));
   return BrotliDecompressBuffer(compressed);
 };

@@ -42,16 +42,18 @@ brotli.decompress(fs.readFileSync('compressed.bin'));
 
 ### brotli.compress(buffer, isText = false)
 
-Compresses the given buffer.  Pass `true` as the second argument if the input
-buffer is text data.  Pass `false` or nothing if it is binary.  This function
-is known to be quite slow.
+Compresses the given buffer. Pass optional parameters as the second argument.
 
 ```javascript
 // encode a buffer of binary data
 brotli.compress(fs.readFileSync('myfile.bin'));
 
-// encode some text data
-brotli.compress(fs.readFileSync('myfile.bin'), true);
+// encode some data with options (default options shown)
+brotli.compress(fs.readFileSync('myfile.bin'), {
+  mode: 0, // 0 = generic, 1 = text, 2 = font (WOFF2)
+  quality: 11, // 0 - 11
+  lgwin: 22 // window size
+});
 ```
 
 ## License

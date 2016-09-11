@@ -20,9 +20,7 @@
   },
   "homepage": "https://github.com/devongovett/brotli.js",
   "dependencies": {
-    "brfs": "^1.4.0",
-    "pako": "^0.2.6",
-    "through": "^2.3.6"
+    "base64-js": "^1.1.2"
   },
   "devDependencies": {
     "mocha": "^2.2.1"
@@ -30,12 +28,8 @@
   "browser": {
     "./dec/dictionary-data.js": "./dec/dictionary-browser.js"
   },
-  "browserify": {
-    "transform": [
-      "./src/transform"
-    ]
-  },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "prepublish": "make"
   }
 }
