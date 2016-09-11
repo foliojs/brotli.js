@@ -8,7 +8,6 @@ var brotli = require('./build/encode');
  */
 module.exports = function(buffer, opts) {
   // default to binary data
-  // var mode = isText ? 0 : 1;
   var quality = 11;
   var mode = 0;
   var lgwin = 0;
