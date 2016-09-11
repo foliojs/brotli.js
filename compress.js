@@ -10,14 +10,14 @@ module.exports = function(buffer, opts) {
   // default to binary data
   var quality = 11;
   var mode = 0;
-  var lgwin = 0;
+  var lgwin = 22;
   
   if (typeof opts === 'boolean') {
     mode = opts ? 0 : 1;
   } else if (typeof opts === 'object') {
     quality = opts.quality || 11;
     mode = opts.mode || 0;
-    mode = opts.lgwin || 0;
+    mode = opts.lgwin || 22;
   }
   
   // allocate input buffer and copy data to it
