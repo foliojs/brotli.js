@@ -17,7 +17,7 @@ module.exports = function(buffer, opts) {
   } else if (typeof opts === 'object') {
     quality = opts.quality || 11;
     mode = opts.mode || 0;
-    mode = opts.lgwin || 22;
+    lgwin = opts.lgwin || 22;
   }
   
   // allocate input buffer and copy data to it
@@ -26,7 +26,7 @@ module.exports = function(buffer, opts) {
   
   // allocate output buffer (same size + some padding to be sure it fits), and encode
   var outBuf = brotli._malloc(buffer.length + 1024);
-  var encodedSize = brotli._encode(11, 0, mode, buffer.length, buf, buffer.length, outBuf);
+  var encodedSize = brotli._encode(quality, lgwin, mode, buffer.length, buf, buffer.length, outBuf);
   
   var outBuffer = null;
   if (encodedSize !== -1) {
