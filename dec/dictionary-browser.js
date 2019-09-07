@@ -1,5 +1,4 @@
 var base64 = require('base64-js');
-var fs = require('fs');
 
 /**
  * The normal dictionary-data.js is quite large, which makes it 
