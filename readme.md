@@ -56,6 +56,10 @@ brotli.compress(fs.readFileSync('myfile.bin'), {
 });
 ```
 
+## CLI
+
+Check out [brotli-cli](https://github.com/dzek69/brotli-cli/) if seeking a command line interface using this library.
+
 ## License
 
 MIT
