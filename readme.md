@@ -5,9 +5,15 @@ with Emscripten.  The original C++ source code can be found [here](http://github
 
 ## Installation and usage
 
+### NodeJS
+
+_Update_: Node has its own [brotli implementation](https://nodejs.org/api/zlib.html#zlib_zlib_brotlicompress_buffer_options_callback) as part of the `zlib` module that should be used instead.
+
 Install using npm.
 
     npm install brotli
+
+### Browser
 
 If you want to use brotli in the browser, you should use [Browserify](http://browserify.org/) to build it.
 
