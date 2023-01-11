@@ -23,7 +23,7 @@
     "base64-js": "^1.1.2"
   },
   "devDependencies": {
-    "mocha": "^2.2.1"
+    "mocha": "^10.2.0"
   },
   "browser": {
     "./dec/dictionary-data.js": "./dec/dictionary-browser.js"
