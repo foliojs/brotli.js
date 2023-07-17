@@ -854,7 +854,7 @@ function BrotliDecompress(input, output) {
       }
 
       /* Convert the distance code to the actual distance by possibly looking */
-      /* up past distnaces from the ringbuffer. */
+      /* up past distances from the ringbuffer. */
       distance = TranslateShortCodes(distance_code, dist_rb, dist_rb_idx);
       if (distance < 0) {
         throw new Error('[BrotliDecompress] invalid distance');
