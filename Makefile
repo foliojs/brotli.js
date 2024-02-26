@@ -1,5 +1,5 @@
 CPP = emcc
-CPPFLAGS = -O3 -s TOTAL_MEMORY=318767104 -s NO_FILESYSTEM=1 --pre-js enc/pre.js
+CPPFLAGS = -O3 -s TOTAL_MEMORY=318767104 -s NO_FILESYSTEM=1 --closure 1 --pre-js enc/pre.js
 
 COMMONDIR = vendor/brotli/c/common
 ENCDIR = vendor/brotli/c/enc
