@@ -1,15 +1,15 @@
 CPP = emcc
-CPPFLAGS = -O3 -s TOTAL_MEMORY=318767104 -s NO_FILESYSTEM=1 -s NO_BROWSER=1 --closure 1 --llvm-lto 1 --pre-js enc/pre.js
+CPPFLAGS = -O3 -s TOTAL_MEMORY=318767104 -s NO_FILESYSTEM=1 --closure 1 --llvm-lto 1 --pre-js enc/pre.js
 
-COMMONDIR = vendor/brotli/common
-ENCDIR = vendor/brotli/enc
+COMMONDIR = vendor/brotli/c/common
+ENCDIR = vendor/brotli/c/enc
 ENCSRC = enc/encode.c $(wildcard $(COMMONDIR)/*.c) $(wildcard $(ENCDIR)/*.c)
 ENCOBJ = $(ENCSRC:.c=.o)
 
 all: build/encode.js
 
 .c.o .cc.o:
-	$(CPP) -I vendor/brotli/include -c $< -o $@
+	$(CPP) -I vendor/brotli/c/include/ -c $< -o $@
 		
 build/encode.js: enc/pre.js $(ENCOBJ)
 	mkdir -p build/
