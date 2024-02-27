@@ -39,6 +39,8 @@ describe('brotli', function() {
       var res = compress(data, { dictionary: dictionary });
       var diff = fs.readFileSync(__dirname + '/testdata/alice30_diff_from_29.txt.sbr');
       assert(res.length == diff.length);
+      // The first char of the output is different between our function and the CLI version.
+      assert.deepEqual(res.slice(1), diff.slice(1));
     });
   });
   

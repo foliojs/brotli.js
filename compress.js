@@ -26,9 +26,12 @@ module.exports = function(buffer, opts) {
   var buf = brotli._malloc(buffer.length);
   brotli.HEAPU8.set(buffer, buf);
   
+  // allocate dictionary buffer and copy data to it
+  var dict = brotli._malloc(dictionary.length);
+  brotli.HEAPU8.set(dictionary, dict);
   // allocate output buffer (same size + some padding to be sure it fits), and encode
   var outBuf = brotli._malloc(buffer.length + 1024);
-  var encodedSize = brotli._encodeWithDictionary(quality, lgwin, mode, buffer.length, buf, dictionary.length, dictionary, buffer.length, outBuf);
+  var encodedSize = brotli._encodeWithDictionary(quality, lgwin, mode, buffer.length, buf, dictionary.length, dict, buffer.length, outBuf);
   
   var outBuffer = null;
   if (encodedSize !== -1) {
