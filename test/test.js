@@ -32,6 +32,14 @@ describe('brotli', function() {
       var res = compress(data, true);
       assert(res.length < data.length);
     });
+
+    it('compress some text with a dictionary', function() {
+      var dictionary = fs.readFileSync(__dirname + '/testdata/alice29.txt');
+      var data = fs.readFileSync(__dirname + '/testdata/alice30.txt');
+      var res = compress(data, { dictionary: dictionary });
+      var diff = fs.readFileSync(__dirname + '/testdata/alice30_diff_from_29.txt.sbr');
+      assert(res.length == diff.length);
+    });
   });
   
   describe('decompress', function() {

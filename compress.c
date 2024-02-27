@@ -5,10 +5,14 @@
 
 #include <brotli/encode.h>
 
+// Use the brotli streaming API in order to encode the input.
+// Based on a code snippet from @eustas
 EMSCRIPTEN_KEEPALIVE
 size_t encodeWithDictionary(
     int quality, int lgwin, BrotliEncoderMode mode, size_t input_size,
     const uint8_t input_buffer[BROTLI_ARRAY_PARAM(input_size)],
+    size_t dictionary_size,
+    const uint8_t dictionary_buffer[BROTLI_ARRAY_PARAM(dictionary_size)],
     size_t encoded_size,
     uint8_t encoded_buffer[BROTLI_ARRAY_PARAM(encoded_size)]) {
   BrotliEncoderState* state =
@@ -39,6 +43,20 @@ size_t encodeWithDictionary(
     BrotliEncoderDestroyInstance(state);
     return 0;
   }
+  BrotliEncoderPreparedDictionary* prepared = NULL;
+  if (dictionary_size) {
+    prepared = BrotliEncoderPrepareDictionary(
+        BROTLI_SHARED_DICTIONARY_RAW, dictionary_size,
+        dictionary_buffer, quality, NULL, NULL, NULL);
+    if (!prepared) {
+      BrotliEncoderDestroyInstance(state);
+      return 0;
+    }
+    if (!BrotliEncoderAttachPreparedDictionary(state, prepared)) {
+      BrotliEncoderDestroyInstance(state);
+      return 0;
+    }
+  }
   size_t available_in, available_out = 0, bytes_written = 0;
   BROTLI_BOOL result = BROTLI_TRUE;
   result = BrotliEncoderCompressStream(
@@ -47,7 +65,6 @@ size_t encodeWithDictionary(
   size_t initial_buffer_size = 0;
   size_t output_buffer_size = 0;
   const uint8_t* buffer = BrotliEncoderTakeOutput(state, &initial_buffer_size);
-  fprintf(stderr, "initial %zu encoded %zu\n", initial_buffer_size, encoded_size);
   assert(initial_buffer_size <= encoded_size);
   memcpy(encoded_buffer, buffer, initial_buffer_size);
   output_buffer_size += initial_buffer_size;
@@ -59,11 +76,11 @@ size_t encodeWithDictionary(
         &available_out, NULL, NULL);
     size_t buffer_size = 0;
     const uint8_t* buffer = BrotliEncoderTakeOutput(state, &buffer_size);
-    fprintf(stderr, "buffer %zu encoded %zu\n", buffer_size, encoded_size);
     assert(output_buffer_size + buffer_size <= encoded_size);
     memcpy(encoded_buffer + initial_buffer_size, buffer, buffer_size);
     output_buffer_size += buffer_size;
   }
+  BrotliEncoderDestroyPreparedDictionary(prepared);
   BrotliEncoderDestroyInstance(state);
   // Keeping all data in a buffer until the input stream is exhausted is
   // infeasible, so some data may have emitted when the error is reported.
