@@ -40,6 +40,8 @@ describe('brotli', function() {
       var diff = fs.readFileSync(__dirname + '/testdata/alice30_diff_from_29.txt.sbr');
       assert(res.length == diff.length);
       // The first char of the output is different between our function and the CLI version.
+      // It presumably represents the window size difference when encoding. It has no impact
+      // on decoding outcomes.
       assert.deepEqual(res.slice(1), diff.slice(1));
     });
   });
