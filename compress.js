@@ -26,7 +26,7 @@ module.exports = function(buffer, opts) {
   
   // allocate output buffer (same size + some padding to be sure it fits), and encode
   var outBuf = brotli._malloc(buffer.length + 1024);
-  var encodedSize = brotli._encode(quality, lgwin, mode, buffer.length, buf, buffer.length, outBuf);
+  var encodedSize = brotli._encodeWithDictionary(quality, lgwin, mode, buffer.length, buf, buffer.length, outBuf);
   
   var outBuffer = null;
   if (encodedSize !== -1) {

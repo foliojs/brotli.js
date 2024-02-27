@@ -3,7 +3,7 @@ CPPFLAGS = -O3 -s TOTAL_MEMORY=318767104 -s NO_FILESYSTEM=1 --closure 1 --pre-js
 
 COMMONDIR = vendor/brotli/c/common
 ENCDIR = vendor/brotli/c/enc
-ENCSRC = enc/encode.c $(wildcard $(COMMONDIR)/*.c) $(wildcard $(ENCDIR)/*.c)
+ENCSRC = compress.c enc/encode.c $(wildcard $(COMMONDIR)/*.c) $(wildcard $(ENCDIR)/*.c)
 ENCOBJ = $(ENCSRC:.c=.o)
 
 all: build/encode.js
@@ -13,7 +13,7 @@ all: build/encode.js
 		
 build/encode.js: enc/pre.js $(ENCOBJ)
 	mkdir -p build/
-	$(CPP) $(CPPFLAGS) -s EXPORTED_FUNCTIONS="['_encode', '_malloc', '_free']" $(ENCOBJ) -o build/encode.js
+	$(CPP) $(CPPFLAGS) -s EXPORTED_FUNCTIONS="['_encode', '_malloc', '_free', '_encodeWithDictionary']" $(ENCOBJ) -o build/encode.js
 	
 clean:
 	rm -rf $(ENCOBJ) build/
