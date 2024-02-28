@@ -13,20 +13,20 @@ describe('brotli', function() {
       var res = brotli.compress(data);
       assert(res.length < data.length);
     });
-    
+
     it('should compress some binary data using standalone version', function() {
       var data = fs.readFileSync('build/encode.js').slice(0, 1024 * 4);
       var res = compress(data);
       assert(res.length < data.length);
     });
-    
+
     it('should compress some text data', function() {
       this.timeout(100000); // not sure why the first time text data is compressed it is slow...
       var data = fs.readFileSync('build/encode.js', 'utf8').slice(0, 1024 * 4);
       var res = brotli.compress(data, true);
       assert(res.length < data.length);
     });
-    
+
     it('should compress some text data using standalone version', function() {
       var data = fs.readFileSync('build/encode.js', 'utf8').slice(0, 1024 * 4);
       var res = compress(data, true);
@@ -44,12 +44,17 @@ describe('brotli', function() {
       // on decoding outcomes.
       assert.deepEqual(res.slice(1), diff.slice(1));
     });
+
+    it('should compress short data', function() {
+      let res = compress(Buffer.from([255, 255, 255]));
+      assert(res.length > 3);
+    });
   });
-  
+
   describe('decompress', function() {
     fs.readdirSync(__dirname + '/testdata').forEach(function(file) {
       if (!/\.compressed/.test(file)) return;
-      
+
       it(file, function() {
         var compressed = fs.readFileSync(__dirname + '/testdata/' + file);
         var expected = fs.readFileSync(__dirname + '/testdata/' + file.replace(/\.compressed.*/, ''));
@@ -58,7 +63,7 @@ describe('brotli', function() {
       });
     });
   });
-  
+
   describe('roundtrip', function() {
     var files = ['alice29.txt', 'asyoulik.txt', 'lcet10.txt', 'plrabn12.txt'];
     files.forEach(function(file) {
