@@ -11,6 +11,7 @@ module.exports = function(buffer, opts) {
   var quality = 11;
   var mode = 0;
   var lgwin = 22;
+  var dictionary = "";
   
   if (typeof opts === 'boolean') {
     mode = opts ? 0 : 1;
@@ -18,15 +19,19 @@ module.exports = function(buffer, opts) {
     quality = opts.quality || 11;
     mode = opts.mode || 0;
     lgwin = opts.lgwin || 22;
+    dictionary = opts.dictionary || "";
   }
   
   // allocate input buffer and copy data to it
   var buf = brotli._malloc(buffer.length);
   brotli.HEAPU8.set(buffer, buf);
   
+  // allocate dictionary buffer and copy data to it
+  var dict = brotli._malloc(dictionary.length);
+  brotli.HEAPU8.set(dictionary, dict);
   // allocate output buffer (same size + some padding to be sure it fits), and encode
   var outBuf = brotli._malloc(buffer.length + 1024);
-  var encodedSize = brotli._encode(quality, lgwin, mode, buffer.length, buf, buffer.length, outBuf);
+  var encodedSize = brotli._encodeWithDictionary(quality, lgwin, mode, buffer.length, buf, dictionary.length, dict, buffer.length, outBuf);
   
   var outBuffer = null;
   if (encodedSize !== -1) {

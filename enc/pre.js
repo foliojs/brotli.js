@@ -1,4 +1,3 @@
-var Module = {};
 var decode = require('../decompress');
 var base64 = require('base64-js');
 Module['readBinary'] = function() {
