@@ -9,15 +9,15 @@ Install using npm.
 
     npm install brotli
 
-If you want to use brotli in the browser, you should use [Browserify](http://browserify.org/) to build it.
+If you want to use brotli in the browser, you should use a bundler to build it.
 
-In node, or in browserify, you can load brotli in the standard way:
+In node, or in bundlers, you can load brotli in the standard way:
 
 ```javascript
 var brotli = require('brotli');
 ```
 
-You can also require just the `decompress` function or just the `compress` function, which is useful for browserify builds.
+You can also require just the `decompress` function or just the `compress` function, which is useful for browser builds.
 For example, here's how you'd require just the `decompress` function.
 
 ```javascript
@@ -52,7 +52,8 @@ brotli.compress(fs.readFileSync('myfile.bin'));
 brotli.compress(fs.readFileSync('myfile.bin'), {
   mode: 0, // 0 = generic, 1 = text, 2 = font (WOFF2)
   quality: 11, // 0 - 11
-  lgwin: 22 // window size
+  lgwin: 22, // window size
+  dictionary: ''
 });
 ```
 
