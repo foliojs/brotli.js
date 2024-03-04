@@ -7,6 +7,7 @@
     "type": "git",
     "url": "https://github.com/devongovett/brotli.js.git"
   },
+  "type": "module",
   "keywords": [
     "compress",
     "decompress",
@@ -23,7 +24,7 @@
     "base64-js": "^1.1.2"
   },
   "devDependencies": {
-    "mocha": "^2.2.1"
+    "mocha": "^10.3.0"
   },
   "browser": {
     "./dec/dictionary-data.js": "./dec/dictionary-browser.js"

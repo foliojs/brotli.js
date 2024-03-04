@@ -1,4 +1,4 @@
-var brotli = require('./build/encode');
+import brotliPromise from './build/brotli.js';
 
 /**
  * Compresses the given buffer
@@ -6,7 +6,8 @@ var brotli = require('./build/encode');
  * text or binary data (the default is binary).
  * Returns null on error
  */
-module.exports = function(buffer, opts) {
+export const compress = async function(buffer, opts) {
+  const brotli = await brotliPromise();
   // default to binary data
   var quality = 11;
   var mode = 0;
