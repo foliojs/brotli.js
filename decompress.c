@@ -6,6 +6,12 @@
 size_t INITIAL_BUFFERS_SIZE = 1 << 8;
 size_t BUFFER_SIZE = 1 << 16;
 
+void leave(BrotliDecoderState* state, const uint8_t** buffers, size_t* buffers_sizes) {
+  BrotliDecoderDestroyInstance(state);
+  free(buffers);
+  free(buffers_sizes);
+}
+
 uint8_t* decompress(const uint8_t input_buffer[BROTLI_ARRAY_PARAM(input_size)],
   size_t input_size, size_t* decompressed_size) {
   BrotliDecoderState* state = BrotliDecoderCreateInstance(NULL, NULL, NULL);
@@ -27,7 +33,7 @@ uint8_t* decompress(const uint8_t input_buffer[BROTLI_ARRAY_PARAM(input_size)],
     result = BrotliDecoderDecompressStream(state, &available_in, &next_in, NULL, NULL, NULL);
 
     if (result == BROTLI_DECODER_RESULT_ERROR) {
-      BrotliDecoderDestroyInstance(state);
+      leave(state, buffers, buffers_sizes);
       return NULL;
     }
     size_t buffer_size = 0;
@@ -44,13 +50,13 @@ uint8_t* decompress(const uint8_t input_buffer[BROTLI_ARRAY_PARAM(input_size)],
         buffers = (const uint8_t**)realloc(buffers, buffers_array_size);
         buffers_sizes = (size_t*)realloc(buffers_sizes, buffers_array_size);
         if (!buffers || !buffers_sizes) {
-          BrotliDecoderDestroyInstance(state);
+          leave(state, buffers, buffers_sizes);
           return NULL;
         }
       }
     }
     if (result == BROTLI_DECODER_RESULT_NEEDS_MORE_INPUT) {
-      BrotliDecoderDestroyInstance(state);
+      leave(state, buffers, buffers_sizes);
       return NULL;
     }
   }
@@ -63,8 +69,7 @@ uint8_t* decompress(const uint8_t input_buffer[BROTLI_ARRAY_PARAM(input_size)],
   
   *decompressed_size = total_out;
 
-
-  BrotliDecoderDestroyInstance(state);
+  leave(state, buffers, buffers_sizes);
   return decompressed_data;
 }
 
