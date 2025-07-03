@@ -16,10 +16,10 @@ module.exports = function(buffer, opts) {
   if (typeof opts === 'boolean') {
     mode = opts ? 0 : 1;
   } else if (typeof opts === 'object') {
-    quality = opts.quality || 11;
-    mode = opts.mode || 0;
-    lgwin = opts.lgwin || 22;
-    dictionary = opts.dictionary || "";
+    quality = opts.quality ?? 11;
+    mode = opts.mode ?? 0;
+    lgwin = opts.lgwin ?? 22;
+    dictionary = opts.dictionary ?? "";
   }
 
   // allocate input buffer and copy data to it
