@@ -18,37 +18,36 @@
 
 /* Represents the range of values belonging to a prefix code: */
 /* [offset, offset + 2^nbits) */
-function PrefixCodeRange(offset, nbits) {
-  this.offset = offset;
-  this.nbits = nbits;
+function prefixCodeRange(offset, nbits) {
+  return { offset, nbits };
 }
 
 export const kBlockLengthPrefixCode = [
-  new PrefixCodeRange(1, 2), new PrefixCodeRange(5, 2), new PrefixCodeRange(9, 2), new PrefixCodeRange(13, 2),
-  new PrefixCodeRange(17, 3), new PrefixCodeRange(25, 3), new PrefixCodeRange(33, 3), new PrefixCodeRange(41, 3),
-  new PrefixCodeRange(49, 4), new PrefixCodeRange(65, 4), new PrefixCodeRange(81, 4), new PrefixCodeRange(97, 4),
-  new PrefixCodeRange(113, 5), new PrefixCodeRange(145, 5), new PrefixCodeRange(177, 5), new PrefixCodeRange(209, 5),
-  new PrefixCodeRange(241, 6), new PrefixCodeRange(305, 6), new PrefixCodeRange(369, 7), new PrefixCodeRange(497, 8),
-  new PrefixCodeRange(753, 9), new PrefixCodeRange(1265, 10), new PrefixCodeRange(2289, 11), new PrefixCodeRange(4337, 12),
-  new PrefixCodeRange(8433, 13), new PrefixCodeRange(16625, 24)
+  prefixCodeRange(1, 2), prefixCodeRange(5, 2), prefixCodeRange(9, 2), prefixCodeRange(13, 2),
+  prefixCodeRange(17, 3), prefixCodeRange(25, 3), prefixCodeRange(33, 3), prefixCodeRange(41, 3),
+  prefixCodeRange(49, 4), prefixCodeRange(65, 4), prefixCodeRange(81, 4), prefixCodeRange(97, 4),
+  prefixCodeRange(113, 5), prefixCodeRange(145, 5), prefixCodeRange(177, 5), prefixCodeRange(209, 5),
+  prefixCodeRange(241, 6), prefixCodeRange(305, 6), prefixCodeRange(369, 7), prefixCodeRange(497, 8),
+  prefixCodeRange(753, 9), prefixCodeRange(1265, 10), prefixCodeRange(2289, 11), prefixCodeRange(4337, 12),
+  prefixCodeRange(8433, 13), prefixCodeRange(16625, 24)
 ];
 
 export const kInsertLengthPrefixCode = [
-  new PrefixCodeRange(0, 0), new PrefixCodeRange(1, 0), new PrefixCodeRange(2, 0), new PrefixCodeRange(3, 0),
-  new PrefixCodeRange(4, 0), new PrefixCodeRange(5, 0), new PrefixCodeRange(6, 1), new PrefixCodeRange(8, 1),
-  new PrefixCodeRange(10, 2), new PrefixCodeRange(14, 2), new PrefixCodeRange(18, 3), new PrefixCodeRange(26, 3),
-  new PrefixCodeRange(34, 4), new PrefixCodeRange(50, 4), new PrefixCodeRange(66, 5), new PrefixCodeRange(98, 5),
-  new PrefixCodeRange(130, 6), new PrefixCodeRange(194, 7), new PrefixCodeRange(322, 8), new PrefixCodeRange(578, 9),
-  new PrefixCodeRange(1090, 10), new PrefixCodeRange(2114, 12), new PrefixCodeRange(6210, 14), new PrefixCodeRange(22594, 24),
+  prefixCodeRange(0, 0), prefixCodeRange(1, 0), prefixCodeRange(2, 0), prefixCodeRange(3, 0),
+  prefixCodeRange(4, 0), prefixCodeRange(5, 0), prefixCodeRange(6, 1), prefixCodeRange(8, 1),
+  prefixCodeRange(10, 2), prefixCodeRange(14, 2), prefixCodeRange(18, 3), prefixCodeRange(26, 3),
+  prefixCodeRange(34, 4), prefixCodeRange(50, 4), prefixCodeRange(66, 5), prefixCodeRange(98, 5),
+  prefixCodeRange(130, 6), prefixCodeRange(194, 7), prefixCodeRange(322, 8), prefixCodeRange(578, 9),
+  prefixCodeRange(1090, 10), prefixCodeRange(2114, 12), prefixCodeRange(6210, 14), prefixCodeRange(22594, 24),
 ];
 
 export const kCopyLengthPrefixCode = [
-  new PrefixCodeRange(2, 0), new PrefixCodeRange(3, 0), new PrefixCodeRange(4, 0), new PrefixCodeRange(5, 0),
-  new PrefixCodeRange(6, 0), new PrefixCodeRange(7, 0), new PrefixCodeRange(8, 0), new PrefixCodeRange(9, 0),
-  new PrefixCodeRange(10, 1), new PrefixCodeRange(12, 1), new PrefixCodeRange(14, 2), new PrefixCodeRange(18, 2),
-  new PrefixCodeRange(22, 3), new PrefixCodeRange(30, 3), new PrefixCodeRange(38, 4), new PrefixCodeRange(54, 4),
-  new PrefixCodeRange(70, 5), new PrefixCodeRange(102, 5), new PrefixCodeRange(134, 6), new PrefixCodeRange(198, 7),
-  new PrefixCodeRange(326, 8), new PrefixCodeRange(582, 9), new PrefixCodeRange(1094, 10), new PrefixCodeRange(2118, 24),
+  prefixCodeRange(2, 0), prefixCodeRange(3, 0), prefixCodeRange(4, 0), prefixCodeRange(5, 0),
+  prefixCodeRange(6, 0), prefixCodeRange(7, 0), prefixCodeRange(8, 0), prefixCodeRange(9, 0),
+  prefixCodeRange(10, 1), prefixCodeRange(12, 1), prefixCodeRange(14, 2), prefixCodeRange(18, 2),
+  prefixCodeRange(22, 3), prefixCodeRange(30, 3), prefixCodeRange(38, 4), prefixCodeRange(54, 4),
+  prefixCodeRange(70, 5), prefixCodeRange(102, 5), prefixCodeRange(134, 6), prefixCodeRange(198, 7),
+  prefixCodeRange(326, 8), prefixCodeRange(582, 9), prefixCodeRange(1094, 10), prefixCodeRange(2118, 24),
 ];
 
 export const kInsertRangeLut = [
