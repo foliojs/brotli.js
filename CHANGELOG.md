@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Changed
+ - Use the nullish coalescing (??) operator to check if the value is defined (#38)
+
 ## 2.0.0 - 2026-10-10
 
 ### Changed
