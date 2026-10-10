@@ -5,21 +5,11 @@
   "type": "module",
   "main": "index.js",
   "exports": {
-    ".": {
-      "import": "./index.js"
-    },
-    "./compress": {
-      "import": "./compress.js"
-    },
-    "./compress.js": {
-      "import": "./compress.js"
-    },
-    "./decompress": {
-      "import": "./decompress.js"
-    },
-    "./decompress.js": {
-      "import": "./decompress.js"
-    }
+    ".": "./index.js",
+    "./compress": "./compress.js",
+    "./compress.js": "./compress.js",
+    "./decompress": "./decompress.js",
+    "./decompress.js": "./decompress.js"
   },
   "repository": {
     "type": "git",

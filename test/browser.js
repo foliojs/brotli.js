@@ -44,13 +44,13 @@ async function verifyInBrowserContext(result) {
 describe('browser ESM bundles', function() {
   this.timeout(10000);
 
-  it('initializes the browser dictionary and round-trips data synchronously', async function() {
+  it('initializes the browser dictionary and round-trips data with async compression', async function() {
     const result = await bundle("export { compress, decompress } from 'brotli';");
     const inputs = Object.keys(result.metafile.inputs);
     assert(inputs.includes('dec/dictionary-browser.js'));
     assert(!inputs.includes('dec/dictionary-data.js'));
     const browser = await verifyInBrowserContext(result);
-    const compressed = browser.compress(input);
+    const compressed = await browser.compress(input);
     assert.equal(Object.prototype.toString.call(compressed), '[object Uint8Array]');
     assert.deepEqual(Array.from(browser.decompress(compressed)), Array.from(input));
   });

@@ -9,35 +9,35 @@ const testdata = new URL('./testdata/', import.meta.url);
 
 describe('brotli', function() {
   describe('compress', function() {
-    it('should compress some binary data', function() {
+    it('should compress some binary data', async function() {
       var data = fs.readFileSync(encoderFile).slice(0, 1024 * 4);
-      var res = brotli.compress(data);
+      var res = await brotli.compress(data);
       assert(res.length < data.length);
     });
 
-    it('should compress some binary data using standalone version', function() {
+    it('should compress some binary data using standalone version', async function() {
       var data = fs.readFileSync(encoderFile).slice(0, 1024 * 4);
-      var res = compress(data);
+      var res = await compress(data);
       assert(res.length < data.length);
     });
 
-    it('should compress some text data', function() {
+    it('should compress some text data', async function() {
       this.timeout(100000); // not sure why the first time text data is compressed it is slow...
       var data = fs.readFileSync(encoderFile, 'utf8').slice(0, 1024 * 4);
-      var res = brotli.compress(data, true);
+      var res = await brotli.compress(data, true);
       assert(res.length < data.length);
     });
 
-    it('should compress some text data using standalone version', function() {
+    it('should compress some text data using standalone version', async function() {
       var data = fs.readFileSync(encoderFile, 'utf8').slice(0, 1024 * 4);
-      var res = compress(data, true);
+      var res = await compress(data, true);
       assert(res.length < data.length);
     });
 
-    it('compress some text with a dictionary', function() {
+    it('compress some text with a dictionary', async function() {
       var dictionary = fs.readFileSync(new URL('alice29.txt', testdata));
       var data = fs.readFileSync(new URL('alice30.txt', testdata));
-      var res = compress(data, { dictionary: dictionary });
+      var res = await compress(data, { dictionary: dictionary });
       var diff = fs.readFileSync(new URL('alice30_diff_from_29.txt.sbr', testdata));
       assert(res.length == diff.length);
       // The first char of the output is different between our function and the CLI version.
@@ -46,8 +46,8 @@ describe('brotli', function() {
       assert.deepEqual(res.slice(1), diff.slice(1));
     });
 
-    it('should compress short data', function() {
-      let res = compress(Buffer.from([255, 255, 255]));
+    it('should compress short data', async function() {
+      let res = await compress(Buffer.from([255, 255, 255]));
       assert(res.length > 3);
     });
   });
@@ -68,10 +68,10 @@ describe('brotli', function() {
   describe('roundtrip', function() {
     var files = ['alice29.txt', 'asyoulik.txt', 'lcet10.txt', 'plrabn12.txt'];
     files.forEach(function(file) {
-      it(file, function() {
+      it(file, async function() {
         this.timeout(10000);
         var input = fs.readFileSync(new URL(file, testdata));
-        var compressed = compress(input);
+        var compressed = await compress(input);
         var decompressed = decompress(compressed);
         assert.deepEqual(Buffer.from(decompressed), input);
       });

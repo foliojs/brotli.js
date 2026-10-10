@@ -1,14 +1,19 @@
 import createEncoder from './build/encode.js';
 
-const brotli = await createEncoder();
+let encoderPromise;
 
 /**
  * Compresses the given buffer
  * The second parameter is optional and specifies whether the buffer is
  * text or binary data (the default is binary).
- * Returns null on error
+ * Returns a Promise of the compressed bytes, or null if encoding fails.
+ * Initialization and runtime errors reject the Promise.
  */
-export default function compress(buffer, opts) {
+export default async function compress(buffer, opts) {
+  // Cache failures as well as successful initialization, including synchronous throws.
+  encoderPromise ??= Promise.resolve().then(() => createEncoder());
+  const brotli = await encoderPromise;
+
   // default to binary data
   var quality = 11;
   var mode = 0;

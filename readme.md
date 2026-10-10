@@ -16,8 +16,20 @@ browser bundler:
 import { compress, decompress } from 'brotli';
 ```
 
-There is no default export at the package root, and CommonJS `require()` is not
-supported. CommonJS applications can load the package with dynamic `import()`.
+There is no default export at the package root. Modern Node.js can also load
+these ES modules with `require()` without a flag: Node 20.19+, 22.12+, and later
+releases support this [Node interoperability feature](https://nodejs.org/api/modules.html#loading-ecmascript-modules-using-require).
+
+```javascript
+const { compress, decompress } = require('brotli');
+
+compress(Buffer.from('Hello, Brotli!')).then(compressed => {
+  const original = decompress(compressed);
+  console.log(Buffer.from(original).toString());
+}).catch(console.error);
+```
+
+On older Node.js versions, CommonJS applications can use dynamic `import()`.
 
 You can also import either function on its own, which is useful for browser
 builds. The standalone modules default-export their function; both subpaths
@@ -28,12 +40,19 @@ import decompress from 'brotli/decompress';
 import compress from 'brotli/compress';
 ```
 
-The compressor initializes once using top-level await during module loading.
-After the import completes, `compress()` and `decompress()` are synchronous;
-no startup timer or initialization call is needed. Use a runtime and bundler
-that support ESM and top-level await. Browser builds should output ESM and
-target ES2022 or later. Importing only `brotli/decompress` does not load the
-encoder.
+With modern Node.js `require()`, access standalone functions through `.default`:
+
+```javascript
+const compress = require('brotli/compress').default;
+const decompress = require('brotli/decompress').default;
+```
+
+`compress()` returns a Promise and initializes the encoder lazily on its first
+call. Concurrent calls share the same initialization Promise, and a failed
+initialization is not retried. `decompress()` remains synchronous. No startup
+timer or initialization call is needed, and the package does not use top-level
+await. Browser bundlers must support ESM; the browser tests target ESM/ES2022.
+Importing only `brotli/decompress` does not load the encoder.
 
 ## Building from source
 
@@ -83,17 +102,24 @@ decompress(readFileSync('compressed.bin'));
 
 ### compress(buffer, options)
 
-Compresses the given buffer. Pass optional parameters as the second argument.
+Compresses the given buffer and returns `Promise<Uint8Array | null>`. Pass
+optional parameters as the second argument. The Promise resolves to `null`
+when the encoder reports failure; initialization and runtime errors reject it.
+
+Encoding runs on the calling thread after initialization; this API does not
+use workers or move CPU work off that thread. Input and options are not copied
+before initialization: keep the input buffer, options, and dictionary unchanged
+until the Promise settles.
 
 ```javascript
 import { readFileSync } from 'node:fs';
 import { compress } from 'brotli';
 
 // encode a buffer of binary data
-compress(readFileSync('myfile.bin'));
+const compressed = await compress(readFileSync('myfile.bin'));
 
 // encode some data with options (default options shown)
-compress(readFileSync('myfile.bin'), {
+const compressedWithOptions = await compress(readFileSync('myfile.bin'), {
   mode: 0, // 0 = generic, 1 = text, 2 = font (WOFF2)
   quality: 11, // 0 - 11
   lgwin: 22, // window size
