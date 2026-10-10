@@ -17,7 +17,7 @@ import { BrotliInput, BrotliOutput } from './streams.js';
 import BrotliBitReader from './bit_reader.js';
 import * as BrotliDictionary from './dictionary.js';
 import { HuffmanCode, BrotliBuildHuffmanTable } from './huffman.js';
-import * as Context from './context.js';
+import { lookupOffsets, lookup } from './context.js';
 import * as Prefix from './prefix.js';
 import * as Transform from './transform.js';
 
@@ -570,7 +570,7 @@ export function BrotliDecompressedSize(buffer) {
   return out.meta_block_length;
 }
 
-export function BrotliDecompressBuffer(buffer, output_size) {
+export function decompress(buffer, output_size) {
   var input = new BrotliInput(buffer);
   
   if (output_size == null) {
@@ -748,8 +748,8 @@ export function BrotliDecompress(input, output) {
     context_map_slice = 0;
     dist_context_map_slice = 0;
     context_mode = context_modes[block_type[0]];
-    context_lookup_offset1 = Context.lookupOffsets[context_mode];
-    context_lookup_offset2 = Context.lookupOffsets[context_mode + 1];
+    context_lookup_offset1 = lookupOffsets[context_mode];
+    context_lookup_offset2 = lookupOffsets[context_mode + 1];
     htree_command = hgroup[1].htrees[0];
 
     while (meta_block_remaining_len > 0) {
@@ -802,11 +802,11 @@ export function BrotliDecompress(input, output) {
           context_offset = block_type[0] << kLiteralContextBits;
           context_map_slice = context_offset;
           context_mode = context_modes[block_type[0]];
-          context_lookup_offset1 = Context.lookupOffsets[context_mode];
-          context_lookup_offset2 = Context.lookupOffsets[context_mode + 1];
+          context_lookup_offset1 = lookupOffsets[context_mode];
+          context_lookup_offset2 = lookupOffsets[context_mode + 1];
         }
-        context = (Context.lookup[context_lookup_offset1 + prev_byte1] |
-                   Context.lookup[context_lookup_offset2 + prev_byte2]);
+        context = (lookup[context_lookup_offset1 + prev_byte1] |
+                   lookup[context_lookup_offset2 + prev_byte2]);
         literal_htree_index = context_map[context_map_slice + context];
         --block_length[0];
         prev_byte2 = prev_byte1;

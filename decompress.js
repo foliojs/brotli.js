@@ -1,1 +1,1 @@
-export { BrotliDecompressBuffer as decompress } from './dec/decode.js';
+export { decompress } from './dec/decode.js';

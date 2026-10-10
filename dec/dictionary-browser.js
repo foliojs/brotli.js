@@ -1,5 +1,5 @@
 import base64 from 'base64-js';
-import { BrotliDecompressBuffer } from './decode.js';
+import { decompress } from './decode.js';
 import dictionaryData from './dictionary.bin.js';
 
 /**
@@ -11,5 +11,5 @@ import dictionaryData from './dictionary.bin.js';
  */
 export function init() {
   var compressed = base64.toByteArray(dictionaryData);
-  return BrotliDecompressBuffer(compressed);
+  return decompress(compressed);
 }
