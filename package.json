@@ -50,8 +50,11 @@
     "esbuild": "^0.28.2",
     "mocha": "^12.0.3"
   },
-  "browser": {
-    "./dec/dictionary-data.js": "./dec/dictionary-browser.js"
+  "imports": {
+    "#dictionary-data": {
+      "node": "./dec/dictionary-data.js",
+      "default": "./dec/dictionary-browser.js"
+    }
   },
   "scripts": {
     "test": "node --experimental-vm-modules node_modules/mocha/bin/mocha.js",

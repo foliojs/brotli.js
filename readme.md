@@ -54,7 +54,10 @@ const { decompress } = require('brotli/decompress');
 call. Concurrent calls share the same initialization Promise, and a failed
 initialization is not retried. `decompress()` remains synchronous. No startup
 timer or initialization call is needed, and the package does not use top-level
-await. Browser bundlers must support ESM; the browser tests target ESM/ES2022.
+await. Browser bundlers must support ESM and conditional `package.json` imports;
+the browser tests target ESM/ES2022. The internal `#dictionary-data` import uses
+the inline dictionary under the `node` condition and the compressed dictionary
+under `default`, including browser builds.
 Importing only `brotli/decompress` does not load the encoder.
 
 ## Building from source

@@ -11,16 +11,17 @@ const input = readFileSync(new URL('./testdata/quickfox', import.meta.url));
 const compressedFixture = readFileSync(new URL('./testdata/quickfox.compressed', import.meta.url));
 const dictionaryHash = createHash('sha256').update(dictionary).digest('hex');
 
-function bundle(entry) {
+function bundle(entry, platform = 'browser') {
   return build({
     absWorkingDir: repositoryRoot,
     stdin: {
       contents: entry + "\nexport { dictionary } from './dec/dictionary.js';",
       resolveDir: repositoryRoot,
-      sourcefile: 'browser-entry.js'
+      sourcefile: `${platform}-entry.js`
     },
     bundle: true,
-    platform: 'browser',
+    platform,
+    mainFields: ['main'],
     format: 'esm',
     target: 'es2022',
     metafile: true,
@@ -62,6 +63,32 @@ describe('browser ESM bundles', function() {
     assert(!inputs.includes('dec/dictionary-data.js'));
     assert(!inputs.includes('build/encode.js'));
     assert(!inputs.includes('compress.js'));
+    await verifyInBrowserContext(result);
+  });
+});
+
+describe('conditional dictionary imports', function() {
+  it('uses the inline dictionary in native Node.js', async function() {
+    const { initData } = await import('#dictionary-data');
+    assert.equal(initData(), dictionary);
+  });
+
+  it('bundles the inline dictionary for Node.js', async function() {
+    const result = await bundle("export { decompress } from 'brotli/decompress';", 'node');
+    const inputs = Object.keys(result.metafile.inputs);
+    assert(inputs.includes('dec/dictionary-data.js'));
+    assert(!inputs.includes('dec/dictionary-browser.js'));
+    assert(!inputs.includes('dec/dictionary.bin.js'));
+    assert(!inputs.some(path => path.includes('base64-js')));
+    await verifyInBrowserContext(result);
+  });
+
+  it('bundles the compressed dictionary without environment conditions', async function() {
+    const result = await bundle("export { decompress } from 'brotli/decompress';", 'neutral');
+    const inputs = Object.keys(result.metafile.inputs);
+    assert(inputs.includes('dec/dictionary-browser.js'));
+    assert(inputs.includes('dec/dictionary.bin.js'));
+    assert(!inputs.includes('dec/dictionary-data.js'));
     await verifyInBrowserContext(result);
   });
 });

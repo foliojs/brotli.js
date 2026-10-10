@@ -15,7 +15,7 @@
    Collection of static dictionary words.
 */
 
-import { init as initData } from './dictionary-data.js';
+import { initData } from '#dictionary-data';
 
 export let dictionary;
 

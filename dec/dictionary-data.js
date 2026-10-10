@@ -9464,6 +9464,6 @@ export const dictionary = new Uint8Array([
 ]);
 
 // Used by the browser version
-export function init() {
+export function initData() {
   return dictionary;
 }

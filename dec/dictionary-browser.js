@@ -9,7 +9,7 @@ import dictionaryData from './dictionary.bin.js';
  * the dictionary, and on initial load, Brotli decompresses 
  * it's own dictionary. 😜
  */
-export function init() {
+export function initData() {
   var compressed = base64.toByteArray(dictionaryData);
   return decompress(compressed);
 }
