@@ -20,10 +20,10 @@
   },
   "homepage": "https://github.com/devongovett/brotli.js",
   "dependencies": {
-    "base64-js": "^1.1.2"
+    "base64-js": "^1.5.1"
   },
   "devDependencies": {
-    "mocha": "^2.2.1"
+    "mocha": "^12.0.3"
   },
   "browser": {
     "./dec/dictionary-data.js": "./dec/dictionary-browser.js"
