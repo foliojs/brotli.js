@@ -16,7 +16,10 @@ browser bundler:
 import { compress, decompress } from 'brotli';
 ```
 
-There is no default export at the package root. Modern Node.js can also load
+TypeScript declarations are included for all public entry points. The
+`CompressOptions` type is available from `brotli` and `brotli/compress`.
+
+The public entry points have no default exports. Modern Node.js can also load
 these ES modules with `require()` without a flag: Node 20.19+, 22.12+, and later
 releases support this [Node interoperability feature](https://nodejs.org/api/modules.html#loading-ecmascript-modules-using-require).
 
@@ -32,19 +35,19 @@ compress(Buffer.from('Hello, Brotli!')).then(compressed => {
 On older Node.js versions, CommonJS applications can use dynamic `import()`.
 
 You can also import either function on its own, which is useful for browser
-builds. The standalone modules default-export their function; both subpaths
+builds. The standalone modules export their named function; both subpaths
 also accept a `.js` extension.
 
 ```javascript
-import decompress from 'brotli/decompress';
-import compress from 'brotli/compress';
+import { decompress } from 'brotli/decompress';
+import { compress } from 'brotli/compress';
 ```
 
-With modern Node.js `require()`, access standalone functions through `.default`:
+With modern Node.js `require()`, destructure the standalone functions:
 
 ```javascript
-const compress = require('brotli/compress').default;
-const decompress = require('brotli/decompress').default;
+const { compress } = require('brotli/compress');
+const { decompress } = require('brotli/decompress');
 ```
 
 `compress()` returns a Promise and initializes the encoder lazily on its first

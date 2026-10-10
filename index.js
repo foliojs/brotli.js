@@ -1,2 +1,2 @@
-export { default as compress } from './compress.js';
-export { default as decompress } from './decompress.js';
+export { compress } from './compress.js';
+export { decompress } from './decompress.js';

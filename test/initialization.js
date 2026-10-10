@@ -17,7 +17,7 @@ async function loadCompressor(createEncoder) {
     return encoder;
   });
   await module.evaluate();
-  return module.namespace.default;
+  return module.namespace.compress;
 }
 
 function createTestEncoder(encode = (quality, lgwin, mode, length) => length) {

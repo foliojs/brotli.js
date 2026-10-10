@@ -9,7 +9,7 @@ let encoderPromise;
  * Returns a Promise of the compressed bytes, or null if encoding fails.
  * Initialization and runtime errors reject the Promise.
  */
-export default async function compress(buffer, opts) {
+export async function compress(buffer, opts) {
   // Cache failures as well as successful initialization, including synchronous throws.
   encoderPromise ??= Promise.resolve().then(() => createEncoder());
   const brotli = await encoderPromise;

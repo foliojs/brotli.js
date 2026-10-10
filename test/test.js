@@ -1,8 +1,8 @@
 import fs from 'node:fs';
 import assert from 'node:assert';
 import * as brotli from 'brotli';
-import decompress from 'brotli/decompress';
-import compress from 'brotli/compress';
+import { decompress } from 'brotli/decompress';
+import { compress } from 'brotli/compress';
 
 const encoderFile = new URL('../build/encode.js', import.meta.url);
 const testdata = new URL('./testdata/', import.meta.url);

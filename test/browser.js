@@ -56,7 +56,7 @@ describe('browser ESM bundles', function() {
   });
 
   it('decodes with the standalone entry without including the encoder', async function() {
-    const result = await bundle("export { default as decompress } from 'brotli/decompress';");
+    const result = await bundle("export { decompress } from 'brotli/decompress';");
     const inputs = Object.keys(result.metafile.inputs);
     assert(inputs.includes('dec/dictionary-browser.js'));
     assert(!inputs.includes('dec/dictionary-data.js'));

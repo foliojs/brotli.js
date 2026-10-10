@@ -4,12 +4,28 @@
   "description": "A port of the Brotli compression algorithm as used in WOFF2",
   "type": "module",
   "main": "index.js",
+  "types": "index.d.ts",
   "exports": {
-    ".": "./index.js",
-    "./compress": "./compress.js",
-    "./compress.js": "./compress.js",
-    "./decompress": "./decompress.js",
-    "./decompress.js": "./decompress.js"
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    },
+    "./compress": {
+      "types": "./compress.d.ts",
+      "default": "./compress.js"
+    },
+    "./compress.js": {
+      "types": "./compress.d.ts",
+      "default": "./compress.js"
+    },
+    "./decompress": {
+      "types": "./decompress.d.ts",
+      "default": "./decompress.js"
+    },
+    "./decompress.js": {
+      "types": "./decompress.d.ts",
+      "default": "./decompress.js"
+    }
   },
   "repository": {
     "type": "git",
