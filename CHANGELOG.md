@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.0.0 - 2026-10-10
+
 ### Changed
 
 - **Breaking:** Converted the package to ESM only. All public entry points use
