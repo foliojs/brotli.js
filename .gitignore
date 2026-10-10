@@ -1,4 +1,5 @@
 build/
 node_modules/
+.emsdk/
 .DS_Store
 *.o

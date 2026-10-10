@@ -24,6 +24,32 @@ For example, here's how you'd require just the `decompress` function.
 var decompress = require('brotli/decompress');
 ```
 
+## Building from source
+
+Building this repository requires Git, Make, Python 3, Node.js, and the
+[Emscripten SDK](https://emscripten.org/docs/getting_started/downloads.html).
+The `emcc` compiler is provided by Emscripten, not by npm.
+
+From the repository root, initialize the Brotli sources and install a local SDK:
+
+```sh
+git submodule update --init --recursive
+git clone https://github.com/emscripten-core/emsdk.git .emsdk
+./.emsdk/emsdk install 6.0.12
+./.emsdk/emsdk activate 6.0.12
+npm ci
+npm test
+```
+
+`npm ci` runs `make` through the `prepublish` script and generates
+`build/encode.js`. The Makefile automatically uses the compiler in `.emsdk`.
+The local SDK is excluded from Git and npm packages.
+
+If Emscripten is already installed elsewhere, activate its environment with
+`source /path/to/emsdk/emsdk_env.sh` before installing dependencies. You can
+also select a compiler explicitly with `make EMCC=/path/to/emcc`.
+Run `make` to rebuild the encoder and `make clean` to remove generated files.
+
 ## API
 
 ### brotli.decompress(buffer, [outSize])

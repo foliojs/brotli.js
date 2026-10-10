@@ -7,3 +7,4 @@ Makefile
 build/all*
 build/decode*
 .gitmodules
+.emsdk/
