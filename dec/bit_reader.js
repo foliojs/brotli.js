@@ -121,4 +121,4 @@ BrotliBitReader.prototype.readBits = function(n_bits) {
   return val;
 };
 
-module.exports = BrotliBitReader;
+export default BrotliBitReader;

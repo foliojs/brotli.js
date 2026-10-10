@@ -3,6 +3,8 @@ CFLAGS ?= -O3
 CPPFLAGS += -I vendor/brotli/c/include/
 LDFLAGS += -s INITIAL_MEMORY=318767104 -s FILESYSTEM=0 --closure 1 \
 	-s WASM=0 -s WASM_ASYNC_COMPILATION=0 \
+	-s MODULARIZE=1 -s EXPORT_ES6=1 \
+	-s MINIMAL_RUNTIME=1 -s EXPORT_KEEPALIVE=1 \
 	-s EXPORTED_FUNCTIONS="['_malloc', '_free', '_encodeWithDictionary']" \
 	-s EXPORTED_RUNTIME_METHODS="['HEAPU8']"
 

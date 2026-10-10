@@ -15,7 +15,7 @@
    Transformations on dictionary words.
 */
 
-var BrotliDictionary = require('./dictionary');
+import * as BrotliDictionary from './dictionary.js';
 
 var kIdentity       = 0;
 var kOmitLast1      = 1;
@@ -175,8 +175,8 @@ var kTransforms = [
      new Transform(        " ", kUppercaseFirst, "='"         )
 ];
 
-exports.kTransforms = kTransforms;
-exports.kNumTransforms = kTransforms.length;
+export { kTransforms };
+export const kNumTransforms = kTransforms.length;
 
 function ToUpperCase(p, i) {
   if (p[i] < 0xc0) {
@@ -197,7 +197,7 @@ function ToUpperCase(p, i) {
   return 3;
 }
 
-exports.transformDictionaryWord = function(dst, idx, word, len, transform) {
+export function transformDictionaryWord(dst, idx, word, len, transform) {
   var prefix = kTransforms[transform].prefix;
   var suffix = kTransforms[transform].suffix;
   var t = kTransforms[transform].transform;

@@ -110,7 +110,7 @@ var CONTEXT_UTF8         = 2;
 var CONTEXT_SIGNED       = 3;
 
 /* Common context lookup table for all context modes. */
-exports.lookup = new Uint8Array([
+export const lookup = new Uint8Array([
   /* CONTEXT_UTF8, last byte. */
   /* ASCII range. */
    0,  0,  0,  0,  0,  0,  0,  0,  0,  4,  4,  0,  0,  4,  0,  0,
@@ -238,7 +238,7 @@ exports.lookup = new Uint8Array([
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 ]);
 
-exports.lookupOffsets = new Uint16Array([
+export const lookupOffsets = new Uint16Array([
   /* CONTEXT_LSB6 */
   1024, 1536,
   /* CONTEXT_MSB6 */

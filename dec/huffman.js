@@ -1,9 +1,7 @@
-function HuffmanCode(bits, value) {
+export function HuffmanCode(bits, value) {
   this.bits = bits;   /* number of bits used for this symbol */
   this.value = value; /* symbol value or table offset */
 }
-
-exports.HuffmanCode = HuffmanCode;
 
 var MAX_LENGTH = 15;
 
@@ -40,7 +38,7 @@ function NextTableBitSize(count, len, root_bits) {
   return len - root_bits;
 }
 
-exports.BrotliBuildHuffmanTable = function(root_table, table, root_bits, code_lengths, code_lengths_size) {
+export function BrotliBuildHuffmanTable(root_table, table, root_bits, code_lengths, code_lengths_size) {
   var start_table = table;
   var code;            /* current table entry */
   var len;             /* current code length */

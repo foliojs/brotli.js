@@ -1,4 +1,4 @@
-function BrotliInput(buffer) {
+export function BrotliInput(buffer) {
   this.buffer = buffer;
   this.pos = 0;
 }
@@ -15,9 +15,7 @@ BrotliInput.prototype.read = function(buf, i, count) {
   return count;
 }
 
-exports.BrotliInput = BrotliInput;
-
-function BrotliOutput(buf) {
+export function BrotliOutput(buf) {
   this.buffer = buf;
   this.pos = 0;
 }
@@ -30,5 +28,3 @@ BrotliOutput.prototype.write = function(buf, count) {
   this.pos += count;
   return count;
 };
-
-exports.BrotliOutput = BrotliOutput;

@@ -9,20 +9,31 @@ Install using npm.
 
     npm install brotli
 
-If you want to use brotli in the browser, you should use a bundler to build it.
-
-In node, or in bundlers, you can load brotli in the standard way:
-
-```javascript
-var brotli = require('brotli');
-```
-
-You can also require just the `decompress` function or just the `compress` function, which is useful for browser builds.
-For example, here's how you'd require just the `decompress` function.
+Brotli.js is an ESM-only package. Import its named functions in Node.js or a
+browser bundler:
 
 ```javascript
-var decompress = require('brotli/decompress');
+import { compress, decompress } from 'brotli';
 ```
+
+There is no default export at the package root, and CommonJS `require()` is not
+supported. CommonJS applications can load the package with dynamic `import()`.
+
+You can also import either function on its own, which is useful for browser
+builds. The standalone modules default-export their function; both subpaths
+also accept a `.js` extension.
+
+```javascript
+import decompress from 'brotli/decompress';
+import compress from 'brotli/compress';
+```
+
+The compressor initializes once using top-level await during module loading.
+After the import completes, `compress()` and `decompress()` are synchronous;
+no startup timer or initialization call is needed. Use a runtime and bundler
+that support ESM and top-level await. Browser builds should output ESM and
+target ES2022 or later. Importing only `brotli/decompress` does not load the
+encoder.
 
 ## Building from source
 
@@ -42,7 +53,8 @@ npm test
 ```
 
 `npm ci` runs `make` through the `prepublish` script and generates
-`build/encode.js`. The Makefile automatically uses the compiler in `.emsdk`.
+`build/encode.js` as an ES module. The Makefile automatically uses the compiler
+in `.emsdk`.
 The local SDK is excluded from Git and npm packages.
 
 If Emscripten is already installed elsewhere, activate its environment with
@@ -52,30 +64,36 @@ Run `make` to rebuild the encoder and `make clean` to remove generated files.
 
 ## API
 
-### brotli.decompress(buffer, [outSize])
+### decompress(buffer, [outSize])
 
 Decompresses the given buffer to produce the original input to the compressor.
 The `outSize` parameter is optional, and will be computed by the decompressor
 if not provided. Inside a WOFF2 file, this can be computed from the WOFF2 directory.
 
 ```javascript
+import { readFileSync } from 'node:fs';
+import { decompress } from 'brotli';
+
 // decode a buffer where the output size is known
-brotli.decompress(compressedData, uncompressedLength);
+decompress(compressedData, uncompressedLength);
 
 // decode a buffer where the output size is not known
-brotli.decompress(fs.readFileSync('compressed.bin'));
+decompress(readFileSync('compressed.bin'));
 ```
 
-### brotli.compress(buffer, isText = false)
+### compress(buffer, options)
 
 Compresses the given buffer. Pass optional parameters as the second argument.
 
 ```javascript
+import { readFileSync } from 'node:fs';
+import { compress } from 'brotli';
+
 // encode a buffer of binary data
-brotli.compress(fs.readFileSync('myfile.bin'));
+compress(readFileSync('myfile.bin'));
 
 // encode some data with options (default options shown)
-brotli.compress(fs.readFileSync('myfile.bin'), {
+compress(readFileSync('myfile.bin'), {
   mode: 0, // 0 = generic, 1 = text, 2 = font (WOFF2)
   quality: 11, // 0 - 11
   lgwin: 22, // window size

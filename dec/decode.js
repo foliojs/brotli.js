@@ -13,15 +13,13 @@
    limitations under the License.
 */
 
-var BrotliInput = require('./streams').BrotliInput;
-var BrotliOutput = require('./streams').BrotliOutput;
-var BrotliBitReader = require('./bit_reader');
-var BrotliDictionary = require('./dictionary');
-var HuffmanCode = require('./huffman').HuffmanCode;
-var BrotliBuildHuffmanTable = require('./huffman').BrotliBuildHuffmanTable;
-var Context = require('./context');
-var Prefix = require('./prefix');
-var Transform = require('./transform');
+import { BrotliInput, BrotliOutput } from './streams.js';
+import BrotliBitReader from './bit_reader.js';
+import * as BrotliDictionary from './dictionary.js';
+import { HuffmanCode, BrotliBuildHuffmanTable } from './huffman.js';
+import * as Context from './context.js';
+import * as Prefix from './prefix.js';
+import * as Transform from './transform.js';
 
 var kDefaultCodeLength = 8;
 var kCodeLengthRepeatCode = 16;
@@ -560,7 +558,7 @@ function JumpToByteBoundary(br) {
   return pad_bits == 0;
 }
 
-function BrotliDecompressedSize(buffer) {
+export function BrotliDecompressedSize(buffer) {
   var input = new BrotliInput(buffer);
   var br = new BrotliBitReader(input);
   DecodeWindowBits(br);
@@ -568,9 +566,7 @@ function BrotliDecompressedSize(buffer) {
   return out.meta_block_length;
 }
 
-exports.BrotliDecompressedSize = BrotliDecompressedSize;
-
-function BrotliDecompressBuffer(buffer, output_size) {
+export function BrotliDecompressBuffer(buffer, output_size) {
   var input = new BrotliInput(buffer);
   
   if (output_size == null) {
@@ -589,9 +585,7 @@ function BrotliDecompressBuffer(buffer, output_size) {
   return output.buffer;
 }
 
-exports.BrotliDecompressBuffer = BrotliDecompressBuffer;
-
-function BrotliDecompress(input, output) {
+export function BrotliDecompress(input, output) {
   var i;
   var pos = 0;
   var input_end = 0;
@@ -932,7 +926,5 @@ function BrotliDecompress(input, output) {
 
   output.write(ringbuffer, pos & ringbuffer_mask);
 }
-
-exports.BrotliDecompress = BrotliDecompress;
 
 BrotliDictionary.init();

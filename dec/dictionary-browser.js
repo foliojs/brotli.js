@@ -1,4 +1,6 @@
-var base64 = require('base64-js');
+import base64 from 'base64-js';
+import { BrotliDecompressBuffer } from './decode.js';
+import dictionaryData from './dictionary.bin.js';
 
 /**
  * The normal dictionary-data.js is quite large, which makes it 
@@ -7,8 +9,7 @@ var base64 = require('base64-js');
  * the dictionary, and on initial load, Brotli decompresses 
  * it's own dictionary. 😜
  */
-exports.init = function() {
-  var BrotliDecompressBuffer = require('./decode').BrotliDecompressBuffer;
-  var compressed = base64.toByteArray(require('./dictionary.bin.js'));
+export function init() {
+  var compressed = base64.toByteArray(dictionaryData);
   return BrotliDecompressBuffer(compressed);
-};
+}

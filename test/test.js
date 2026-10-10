@@ -1,43 +1,44 @@
-var fs = require('fs');
-var assert = require('assert');
-var brotli = require('../');
-var decompress = require('../decompress');
-var compress = require('../compress');
+import fs from 'node:fs';
+import assert from 'node:assert';
+import * as brotli from 'brotli';
+import decompress from 'brotli/decompress';
+import compress from 'brotli/compress';
+
+const encoderFile = new URL('../build/encode.js', import.meta.url);
+const testdata = new URL('./testdata/', import.meta.url);
 
 describe('brotli', function() {
   describe('compress', function() {
-    it('should compress some binary data', async function() {
-      // We need this timer, because otherwise the brotli object is empty at the time we try to compress.
-      await new Promise(r=>setTimeout(r, 10));
-      var data = fs.readFileSync('build/encode.js').slice(0, 1024 * 4);
+    it('should compress some binary data', function() {
+      var data = fs.readFileSync(encoderFile).slice(0, 1024 * 4);
       var res = brotli.compress(data);
       assert(res.length < data.length);
     });
 
     it('should compress some binary data using standalone version', function() {
-      var data = fs.readFileSync('build/encode.js').slice(0, 1024 * 4);
+      var data = fs.readFileSync(encoderFile).slice(0, 1024 * 4);
       var res = compress(data);
       assert(res.length < data.length);
     });
 
     it('should compress some text data', function() {
       this.timeout(100000); // not sure why the first time text data is compressed it is slow...
-      var data = fs.readFileSync('build/encode.js', 'utf8').slice(0, 1024 * 4);
+      var data = fs.readFileSync(encoderFile, 'utf8').slice(0, 1024 * 4);
       var res = brotli.compress(data, true);
       assert(res.length < data.length);
     });
 
     it('should compress some text data using standalone version', function() {
-      var data = fs.readFileSync('build/encode.js', 'utf8').slice(0, 1024 * 4);
+      var data = fs.readFileSync(encoderFile, 'utf8').slice(0, 1024 * 4);
       var res = compress(data, true);
       assert(res.length < data.length);
     });
 
     it('compress some text with a dictionary', function() {
-      var dictionary = fs.readFileSync(__dirname + '/testdata/alice29.txt');
-      var data = fs.readFileSync(__dirname + '/testdata/alice30.txt');
+      var dictionary = fs.readFileSync(new URL('alice29.txt', testdata));
+      var data = fs.readFileSync(new URL('alice30.txt', testdata));
       var res = compress(data, { dictionary: dictionary });
-      var diff = fs.readFileSync(__dirname + '/testdata/alice30_diff_from_29.txt.sbr');
+      var diff = fs.readFileSync(new URL('alice30_diff_from_29.txt.sbr', testdata));
       assert(res.length == diff.length);
       // The first char of the output is different between our function and the CLI version.
       // It presumably represents the window size difference when encoding. It has no impact
@@ -52,14 +53,14 @@ describe('brotli', function() {
   });
 
   describe('decompress', function() {
-    fs.readdirSync(__dirname + '/testdata').forEach(function(file) {
+    fs.readdirSync(testdata).forEach(function(file) {
       if (!/\.compressed/.test(file)) return;
 
       it(file, function() {
-        var compressed = fs.readFileSync(__dirname + '/testdata/' + file);
-        var expected = fs.readFileSync(__dirname + '/testdata/' + file.replace(/\.compressed.*/, ''));
+        var compressed = fs.readFileSync(new URL(file, testdata));
+        var expected = fs.readFileSync(new URL(file.replace(/\.compressed.*/, ''), testdata));
         var result = decompress(compressed);
-        assert.deepEqual(new Buffer(result), expected);
+        assert.deepEqual(Buffer.from(result), expected);
       });
     });
   });
@@ -69,10 +70,10 @@ describe('brotli', function() {
     files.forEach(function(file) {
       it(file, function() {
         this.timeout(10000);
-        var input = fs.readFileSync(__dirname + '/testdata/' + file);
+        var input = fs.readFileSync(new URL(file, testdata));
         var compressed = compress(input);
         var decompressed = decompress(compressed);
-        assert.deepEqual(new Buffer(decompressed), input);
+        assert.deepEqual(Buffer.from(decompressed), input);
       });
     });
   });

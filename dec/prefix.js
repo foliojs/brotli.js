@@ -23,7 +23,7 @@ function PrefixCodeRange(offset, nbits) {
   this.nbits = nbits;
 }
 
-exports.kBlockLengthPrefixCode = [
+export const kBlockLengthPrefixCode = [
   new PrefixCodeRange(1, 2), new PrefixCodeRange(5, 2), new PrefixCodeRange(9, 2), new PrefixCodeRange(13, 2),
   new PrefixCodeRange(17, 3), new PrefixCodeRange(25, 3), new PrefixCodeRange(33, 3), new PrefixCodeRange(41, 3),
   new PrefixCodeRange(49, 4), new PrefixCodeRange(65, 4), new PrefixCodeRange(81, 4), new PrefixCodeRange(97, 4),
@@ -33,7 +33,7 @@ exports.kBlockLengthPrefixCode = [
   new PrefixCodeRange(8433, 13), new PrefixCodeRange(16625, 24)
 ];
 
-exports.kInsertLengthPrefixCode = [
+export const kInsertLengthPrefixCode = [
   new PrefixCodeRange(0, 0), new PrefixCodeRange(1, 0), new PrefixCodeRange(2, 0), new PrefixCodeRange(3, 0),
   new PrefixCodeRange(4, 0), new PrefixCodeRange(5, 0), new PrefixCodeRange(6, 1), new PrefixCodeRange(8, 1),
   new PrefixCodeRange(10, 2), new PrefixCodeRange(14, 2), new PrefixCodeRange(18, 3), new PrefixCodeRange(26, 3),
@@ -42,7 +42,7 @@ exports.kInsertLengthPrefixCode = [
   new PrefixCodeRange(1090, 10), new PrefixCodeRange(2114, 12), new PrefixCodeRange(6210, 14), new PrefixCodeRange(22594, 24),
 ];
 
-exports.kCopyLengthPrefixCode = [
+export const kCopyLengthPrefixCode = [
   new PrefixCodeRange(2, 0), new PrefixCodeRange(3, 0), new PrefixCodeRange(4, 0), new PrefixCodeRange(5, 0),
   new PrefixCodeRange(6, 0), new PrefixCodeRange(7, 0), new PrefixCodeRange(8, 0), new PrefixCodeRange(9, 0),
   new PrefixCodeRange(10, 1), new PrefixCodeRange(12, 1), new PrefixCodeRange(14, 2), new PrefixCodeRange(18, 2),
@@ -51,10 +51,10 @@ exports.kCopyLengthPrefixCode = [
   new PrefixCodeRange(326, 8), new PrefixCodeRange(582, 9), new PrefixCodeRange(1094, 10), new PrefixCodeRange(2118, 24),
 ];
 
-exports.kInsertRangeLut = [
+export const kInsertRangeLut = [
   0, 0, 8, 8, 0, 16, 8, 16, 16,
 ];
 
-exports.kCopyRangeLut = [
+export const kCopyRangeLut = [
   0, 8, 0, 8, 16, 0, 16, 8, 16,
 ];
