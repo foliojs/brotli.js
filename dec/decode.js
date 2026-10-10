@@ -86,11 +86,13 @@ function DecodeVarLenUint8(br) {
   return 0;
 }
 
-function MetaBlockLength() {
-  this.meta_block_length = 0;
-  this.input_end = 0;
-  this.is_uncompressed = 0;
-  this.is_metadata = false;
+class MetaBlockLength {
+  constructor() {
+    this.meta_block_length = 0;
+    this.input_end = 0;
+    this.is_uncompressed = 0;
+    this.is_metadata = false;
+  }
 }
 
 function DecodeMetaBlockLength(br) {
@@ -374,23 +376,25 @@ function InverseMoveToFrontTransform(v, v_len) {
 }
 
 /* Contains a collection of huffman trees with the same alphabet size. */
-function HuffmanTreeGroup(alphabet_size, num_htrees) {
-  this.alphabet_size = alphabet_size;
-  this.num_htrees = num_htrees;
-  this.codes = new Array(num_htrees + num_htrees * kMaxHuffmanTableSize[(alphabet_size + 31) >>> 5]);  
-  this.htrees = new Uint32Array(num_htrees);
+class HuffmanTreeGroup {
+  constructor(alphabet_size, num_htrees) {
+    this.alphabet_size = alphabet_size;
+    this.num_htrees = num_htrees;
+    this.codes = new Array(num_htrees + num_htrees * kMaxHuffmanTableSize[(alphabet_size + 31) >>> 5]);
+    this.htrees = new Uint32Array(num_htrees);
+  }
+  decode(br) {
+    var i;
+    var table_size;
+    var next = 0;
+    for (i = 0; i < this.num_htrees; ++i) {
+      this.htrees[i] = next;
+      table_size = ReadHuffmanCode(this.alphabet_size, this.codes, next, br);
+      next += table_size;
+    }
+  }
 }
 
-HuffmanTreeGroup.prototype.decode = function(br) {
-  var i;
-  var table_size;
-  var next = 0;
-  for (i = 0; i < this.num_htrees; ++i) {
-    this.htrees[i] = next;
-    table_size = ReadHuffmanCode(this.alphabet_size, this.codes, next, br);
-    next += table_size;
-  }
-};
 
 function DecodeContextMap(context_map_size, br) {
   var out = { num_htrees: null, context_map: null };
