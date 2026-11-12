@@ -36,12 +36,16 @@ export async function compress(buffer, opts) {
   // allocate dictionary buffer and copy data to it
   var dict = brotli._malloc(dictionary.length);
   brotli.HEAPU8.set(dictionary, dict);
-  // allocate output buffer (same size + some padding to be sure it fits), and encode
-  var outBuf = brotli._malloc(buffer.length + 1024);
-  var encodedSize = brotli._encodeWithDictionary(quality, lgwin, mode, buffer.length, buf, dictionary.length, dict, buffer.length + 1024, outBuf);
+  // allocate output buffer and encode. Incompressible input grows by a few
+  // header bytes per block (about 3 bytes per KiB at quality 0-1 with
+  // lgwin 10), so leave room for twice that plus some padding.
+  var outSize = buffer.length + (buffer.length >> 7) + 1024;
+  var outBuf = brotli._malloc(outSize);
+  var encodedSize = brotli._encodeWithDictionary(quality, lgwin, mode, buffer.length, buf, dictionary.length, dict, outSize, outBuf);
 
+  // the encoder returns 0 on failure (a valid stream is never empty)
   var outBuffer = null;
-  if (encodedSize !== -1) {
+  if (encodedSize > 0) {
     // allocate and copy data to an output buffer
     outBuffer = new Uint8Array(encodedSize);
     outBuffer.set(brotli.HEAPU8.subarray(outBuf, outBuf + encodedSize));
@@ -49,6 +53,7 @@ export async function compress(buffer, opts) {
 
   // free malloc'd buffers
   brotli._free(buf);
+  brotli._free(dict);
   brotli._free(outBuf);
 
   return outBuffer;
