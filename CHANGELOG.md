@@ -5,6 +5,15 @@
 ### Changed
  - Use the nullish coalescing (??) operator to check if the value is defined (#38)
 
+### Fixed
+ - `compress()` now encodes all of the input. Inputs larger than one encoder
+   block (about 8 MiB at default settings, less at low quality or small lgwin)
+   used to decode to only the first block (#60)
+ - `compress()` returns a valid stream for empty input instead of an empty array,
+   and `null` (as documented) instead of an empty array when encoding fails
+ - The output buffer is now large enough for incompressible input, and the
+   dictionary buffer is freed after each call
+
 ## 2.0.0 - 2026-10-10
 
 ### Changed
